@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News Digest · 极简升级版</title>
+  <style>
+    /* 极简升级版 - 方向 C */
+    /* 视觉DNA：保持极简核心、精致细节、留白艺术、微妙层次 */
+    
+    :root {
+      --bg: #ffffff;
+      --fg: #18181b;
+      --muted: #71717a;
+      --border: #f4f4f5;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --surface: #fafafa;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+      --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    
+    /* 极简头部 */
+    .header {
+      padding: 4rem 0 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .header-brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--fg);
+    }
+    
+    .header-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    
+    .header-nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .header-nav a {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    .header-nav a:hover {
+      color: var(--fg);
+    }
+    
+    .header-content {
+      text-align: center;
+      padding: 2rem 0;
+    }
+    
+    .header-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+    
+    .header-subtitle {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    
+    .header-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    
+    /* 搜索 */
+    .search {
+      margin-bottom: 2rem;
+    }
+    
+    .search input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-family: var(--font);
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    
+    .search input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .search input::placeholder {
+      color: var(--muted);
+    }
+    
+    /* 新闻列表 */
+    .news-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    
+    .news-item {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    
+    .news-item:first-child {
+      padding-top: 0;
+    }
+    
+    .news-item:hover {
+      background: var(--surface);
+      margin: 0 -1.5rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    
+    .news-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .news-source {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    
+    .news-date {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    
+    .news-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+    
+    .news-title a {
+      color: var(--fg);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    .news-title a:hover {
+      color: var(--accent);
+    }
+    
+    .news-summary {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .news-footer {
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .news-link {
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    
+    .news-link:hover {
+      color: var(--accent-hover);
+    }
+    
+    .news-tag {
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      background: var(--border);
+      color: var(--muted);
+      border-radius: 4px;
+    }
+    
+    /* 分隔线 */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+    
+    /* 页脚 */
+    .footer {
+      padding: 3rem 0;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+    
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 2rem;
+    }
+    
+    .footer-left {
+      flex: 1;
+    }
+    
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .footer-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .footer-section h4 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+    
+    .footer-section a {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--fg);
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+      transition: color 0.2s;
+    }
+    
+    .footer-section a:hover {
+      color: var(--accent);
+    }
+    
+    .footer-bottom {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    
+    .footer-bottom p {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .header {
+        padding: 2rem 0 1.5rem;
+      }
+      
+      .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .header-nav {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .header-title {
+        font-size: 1.5rem;
+      }
+      
+      .news-item:hover {
+        margin: 0 -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      
+      .footer-content {
+        flex-direction: column;
+      }
+      
+      .footer-links {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+    
+    /* 深色模式 */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #09090b;
+        --fg: #fafafa;
+        --muted: #a1a1aa;
+        --border: #27272a;
+        --accent: #60a5fa;
+        --accent-hover: #93bbfd;
+        --surface: #18181b;
+      }
+      
+      .news-tag {
+        background: var(--border);
+      }
+    }
+    
+    /* 减少动画 */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 极简头部 -->
+    <header class="header">
+      <div class="header-top">
+        <div class="header-brand">News Digest</div>
+        <div class="header-meta">
+          <span>2026-06-17</span>
+          <span> · </span>
+          <span>第 20 条</span>
+        </div>
+        <nav class="header-nav">
+          <a href="#">首页</a>
+          <a href="#">归档</a>
+          <a href="#">关于</a>
+          <a href="#">RSS</a>
+        </nav>
+      </div>
+      
+      <div class="header-content">
+        <h1 class="header-title">每日国际要闻</h1>
+        <p class="header-subtitle">来源可靠 · 机器翻译 · 读完即走</p>
+        <div class="header-date">2026年6月17日 · 星期三</div>
+      </div>
+    </header>
+    
+    <!-- 搜索 -->
+    <div class="search">
+      <input type="text" placeholder="搜索新闻标题、摘要、来源... (⌘K)">
+    </div>
+    
+    <!-- 新闻列表 -->
+    <main class="news-list">
+      <article class="news-item">
+        <div class="news-header">
+          <span class="news-source">The Guardian</span>
+          <span class="news-date">09:09</span>
+        </div>
+        <h2 class="news-title">
+          <a href="#">G7 commits to 'unwavering support for Ukraine' with pledge to offer more air defence</a>
+        </h2>
+        <p class="news-summary">World leaders backed Ukraine's defence of 'its freedom, sovereignty, and territorial integrity'. Rutte also chooses to address the speculations about the US military presence in Europe.</p>
+        <div class="news-footer">
+          <a href="#" class="news-link">阅读原文 →</a>
+          <span class="news-tag">国际</span>
+        </div>
+      </article>
+      
+      <article class="news-item">
+        <div class="news-header">
+          <span class="news-source">New York Times</span>
+          <span class="news-date">09:05</span>
+        </div>
+        <h2 class="news-title">
+          <a href="#">Congo Returns to World Cup in High Style After 52 Years Away</a>
+        </h2>
+        <p class="news-summary">The soccer stars' sharp black suits with leopard-print details are a nod to a long history of "sapeur" fashion.</p>
+        <div class="news-footer">
+          <a href="#" class="news-link">阅读原文 →</a>
+          <span class="news-tag">体育</span>
+        </div>
+      </article>
+      
+      <article class="news-item">
+        <div class="news-header">
+          <span class="news-source">New York Times</span>
+          <span class="news-date">09:04</span>
+        </div>
+        <h2 class="news-title">
+          <a href="#">Ukraine Tries to Cut Off Crimea, Choking Russian Supply Routes</a>
+        </h2>
+        <p class="news-summary">Scores of targeted attacks against supply routes, part of what Kyiv calls a "logistics lockdown," has caused gasoline shortages.</p>
+        <div class="news-footer">
+          <a href="#" class="news-link">阅读原文 →</a>
+          <span class="news-tag">国际</span>
+        </div>
+      </article>
+      
+      <article class="news-item">
+        <div class="news-header">
+          <span class="news-source">The Guardian</span>
+          <span class="news-date">09:03</span>
+        </div>
+        <h2 class="news-title">
+          <a href="#">AFP investigates banner stunt during Pauline Hanson's National Press Club speech</a>
+        </h2>
+        <p class="news-summary">Activist group GetUp! claims responsibility for incident, saying 'we thought the occasion deserved some honesty'.</p>
+        <div class="news-footer">
+          <a href="#" class="news-link">阅读原文 →</a>
+          <span class="news-tag">政治</span>
+        </div>
+      </article>
+      
+      <article class="news-item">
+        <div class="news-header">
+          <span class="news-source">Bloomberg</span>
+          <span class="news-date">09:02</span>
+        </div>
+        <h2 class="news-title">
+          <a href="#">Horizons Middle East & Africa 6/17/2026</a>
+        </h2>
+        <p class="news-summary">视频报道：中东与非洲地区的最新动态和市场分析。</p>
+        <div class="news-footer">
+          <a href="#" class="news-link">阅读原文 →</a>
+          <span class="news-tag">财经</span>
+        </div>
+      </article>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-left">
+          <div class="footer-brand">News Digest</div>
+          <p class="footer-desc">每日国际要闻中文聚合站<br>来源可靠 · 机器翻译 · 读完即走</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-section">
+            <h4>导航</h4>
+            <a href="#">首页</a>
+            <a href="#">归档</a>
+            <a href="#">关于</a>
+          </div>
+          <div class="footer-section">
+            <h4>订阅</h4>
+            <a href="#">RSS</a>
+            <a href="#">邮件</a>
+          </div>
+          <div class="footer-section">
+            <h4>来源</h4>
+            <a href="#">Reuters</a>
+            <a href="#">BBC</a>
+            <a href="#">Guardian</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 News Digest · 保留所有权利</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

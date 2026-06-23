@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News Digest · 经典报纸风格 · 主题切换版</title>
+  
+  <!-- Google Fonts 加载 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Libre+Baskerville:wght@400;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* 经典报纸风格 - 主题切换版 */
+    /* 支持白色主题和黑色主题切换 */
+    
+    :root {
+      --font-en-title: 'Playfair Display', 'Georgia', serif;
+      --font-en-body: 'Libre Baskerville', 'Georgia', serif;
+      --font-zh: 'Noto Serif SC', 'Source Han Serif SC', '华文宋体', '宋体', serif;
+    }
+    
+    /* 白色主题（默认） */
+    :root,
+    [data-theme="light"] {
+      --ink: #1a1a1a;
+      --paper: #fafaf8;
+      --accent: #8b0000;
+      --border: #d4d0c8;
+      --muted: #6b6b6b;
+      --image-bg: #f0ede8;
+      --code-bg: #f5f5f0;
+    }
+    
+    /* 黑色主题 */
+    [data-theme="dark"] {
+      --ink: #e8e8e8;
+      --paper: #1a1a1a;
+      --accent: #ff6b6b;
+      --border: #333;
+      --muted: #999;
+      --image-bg: #2a2a2a;
+      --code-bg: #222;
+    }
+    
+    /* 跟随系统主题 */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --ink: #e8e8e8;
+        --paper: #1a1a1a;
+        --accent: #ff6b6b;
+        --border: #333;
+        --muted: #999;
+        --image-bg: #2a2a2a;
+        --code-bg: #222;
+      }
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: var(--font-en-body);
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    /* 主题切换按钮 */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      color: var(--ink);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+    
+    .theme-toggle:hover {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    
+    /* 报纸头部 */
+    .masthead {
+      text-align: center;
+      padding: 2rem 0;
+      border-bottom: 4px double var(--ink);
+      margin-bottom: 2rem;
+    }
+    
+    .masthead-date {
+      font-family: var(--font-en-title);
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    
+    .masthead-title {
+      font-family: var(--font-en-title);
+      font-size: 4rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      margin: 0.5rem 0;
+      line-height: 1;
+    }
+    
+    .masthead-subtitle {
+      font-family: var(--font-zh);
+      font-size: 1rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+    
+    /* 导航 */
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    
+    .nav a {
+      font-family: var(--font-zh);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+    }
+    
+    .nav a:hover {
+      color: var(--accent);
+    }
+    
+    /* 搜索 */
+    .search {
+      margin-bottom: 2rem;
+    }
+    
+    .search input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      font-family: var(--font-zh);
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      background: var(--paper);
+      color: var(--ink);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    
+    .search input:focus {
+      border-color: var(--ink);
+    }
+    
+    .search input::placeholder {
+      color: var(--muted);
+      font-style: italic;
+    }
+    
+    /* 头条新闻 */
+    .lead-article {
+      padding: 2rem 0;
+      border-bottom: 2px solid var(--ink);
+      margin-bottom: 2rem;
+    }
+    
+    .lead-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    
+    .lead-text {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .lead-article .news-source {
+      font-family: var(--font-en-title);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+    
+    .lead-article .news-title {
+      font-family: var(--font-en-title);
+      font-size: 2.2rem;
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+    
+    .lead-article .news-title a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+    
+    .lead-article .news-title a:hover {
+      color: var(--accent);
+    }
+    
+    .lead-article .news-summary {
+      font-family: var(--font-en-body);
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+    
+    .lead-article .news-meta {
+      font-family: var(--font-zh);
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: auto;
+    }
+    
+    .news-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .news-link:hover {
+      text-decoration: underline;
+    }
+    
+    /* 图片容器 */
+    .lead-image {
+      position: relative;
+      overflow: hidden;
+      background: var(--image-bg);
+      border: 1px solid var(--border);
+      aspect-ratio: 16/10;
+    }
+    
+    .lead-image .placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-zh);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    
+    /* 瀑布流布局 */
+    .masonry {
+      columns: 2;
+      column-gap: 2rem;
+    }
+    
+    .masonry .news-item {
+      break-inside: avoid;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .masonry .news-item:last-child {
+      border-bottom: none;
+    }
+    
+    .masonry .news-source {
+      font-family: var(--font-en-title);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    
+    .masonry .news-title {
+      font-family: var(--font-en-title);
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 0.8rem;
+    }
+    
+    .masonry .news-title a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+    
+    .masonry .news-title a:hover {
+      color: var(--accent);
+    }
+    
+    .masonry .news-image {
+      margin: 0.8rem 0;
+      background: var(--image-bg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      aspect-ratio: 4/3;
+    }
+    
+    .masonry .news-image .placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-zh);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    
+    .masonry .news-summary {
+      font-family: var(--font-en-body);
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.7;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .masonry .news-meta {
+      margin-top: 0.8rem;
+      font-family: var(--font-zh);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    
+    /* 页脚 */
+    .footer {
+      margin-top: 3rem;
+      padding: 2rem 0;
+      border-top: 4px double var(--ink);
+      text-align: center;
+    }
+    
+    .footer p {
+      font-family: var(--font-zh);
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    
+    .footer a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      color: var(--accent);
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .masthead-title {
+        font-size: 2.5rem;
+      }
+      
+      .lead-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .lead-article .news-title {
+        font-size: 1.6rem;
+      }
+      
+      .masonry {
+        columns: 1;
+      }
+      
+      .theme-toggle {
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 36px;
+        height: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 主题切换按钮 -->
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">
+    <span id="theme-icon">🌙</span>
+  </button>
+  
+  <div class="container">
+    <!-- 报纸头部 -->
+    <header class="masthead">
+      <div class="masthead-date">Wednesday, June 17, 2026</div>
+      <h1 class="masthead-title">NEWS DIGEST</h1>
+      <div class="masthead-subtitle">每日国际要闻中文聚合站 · 来源可靠 · 读完即走</div>
+    </header>
+    
+    <!-- 导航 -->
+    <nav class="nav">
+      <a href="#">首页</a>
+      <a href="#">归档</a>
+      <a href="#">关于</a>
+      <a href="#">RSS</a>
+    </nav>
+    
+    <!-- 搜索 -->
+    <div class="search">
+      <input type="text" placeholder="搜索新闻标题、摘要、来源...">
+    </div>
+    
+    <!-- 头条新闻 -->
+    <article class="lead-article">
+      <div class="lead-content">
+        <div class="lead-text">
+          <div class="news-source">The Guardian</div>
+          <h2 class="news-title">
+            <a href="#">G7 commits to 'unwavering support for Ukraine' with pledge to offer more air defence</a>
+          </h2>
+          <p class="news-summary">World leaders backed Ukraine's defence of 'its freedom, sovereignty, and territorial integrity'. Rutte also chooses to address the speculations about the US military presence in Europe. The US has made clear that it is committed to Nato.</p>
+          <div class="news-meta">
+            <span>2026-06-17</span>
+            <span> · </span>
+            <a href="#" class="news-link">阅读原文 →</a>
+          </div>
+        </div>
+        
+        <div class="lead-image">
+          <div class="placeholder">配图占位</div>
+        </div>
+      </div>
+    </article>
+    
+    <!-- 瀑布流新闻 -->
+    <main class="masonry">
+      <article class="news-item">
+        <div class="news-source">New York Times</div>
+        <h2 class="news-title">
+          <a href="#">Congo Returns to World Cup in High Style After 52 Years Away</a>
+        </h2>
+        <div class="news-image">
+          <div class="placeholder">配图占位</div>
+        </div>
+        <p class="news-summary">The soccer stars' sharp black suits with leopard-print details are a nod to a long history of "sapeur" fashion.</p>
+        <div class="news-meta">
+          <span>2026-06-17</span>
+          <span> · </span>
+          <a href="#" class="news-link">阅读原文 →</a>
+        </div>
+      </article>
+      
+      <article class="news-item">
+        <div class="news-source">New York Times</div>
+        <h2 class="news-title">
+          <a href="#">Ukraine Tries to Cut Off Crimea, Choking Russian Supply Routes</a>
+        </h2>
+        <p class="news-summary">Scores of targeted attacks against supply routes, part of what Kyiv calls a "logistics lockdown," has caused gasoline shortages. Ukraine has been targeting bridges, railways, and fuel depots.</p>
+        <div class="news-meta">
+          <span>2026-06-17</span>
+          <span> · </span>
+          <a href="#" class="news-link">阅读原文 →</a>
+        </div>
+      </article>
+      
+      <article class="news-item">
+        <div class="news-source">The Guardian</div>
+        <h2 class="news-title">
+          <a href="#">AFP investigates banner stunt during Pauline Hanson's National Press Club speech</a>
+        </h2>
+        <div class="news-image">
+          <div class="placeholder">配图占位</div>
+        </div>
+        <p class="news-summary">Activist group GetUp! claims responsibility for incident, saying 'we thought the occasion deserved some honesty'.</p>
+        <div class="news-meta">
+          <span>2026-06-17</span>
+          <span> · </span>
+          <a href="#" class="news-link">阅读原文 →</a>
+        </div>
+      </article>
+      
+      <article class="news-item">
+        <div class="news-source">Bloomberg</div>
+        <h2 class="news-title">
+          <a href="#">Horizons Middle East & Africa 6/17/2026</a>
+        </h2>
+        <p class="news-summary">视频报道：中东与非洲地区的最新动态和市场分析。涵盖石油价格、地缘政治风险等关键议题。</p>
+        <div class="news-meta">
+          <span>2026-06-17</span>
+          <span> · </span>
+          <a href="#" class="news-link">阅读原文 →</a>
+        </div>
+      </article>
+      
+      <article class="news-item">
+        <div class="news-source">Associated Press</div>
+        <h2 class="news-title">
+          <a href="#">Global leaders gather for climate summit amid rising tensions</a>
+        </h2>
+        <p class="news-summary">World leaders are meeting to discuss urgent climate action as extreme weather events increase globally.</p>
+        <div class="news-meta">
+          <span>2026-06-17</span>
+          <span> · </span>
+          <a href="#" class="news-link">阅读原文 →</a>
+        </div>
+      </article>
+      
+      <article class="news-item">
+        <div class="news-source">Reuters</div>
+        <h2 class="news-title">
+          <a href="#">Tech giants face new regulations in European markets</a>
+        </h2>
+        <div class="news-image">
+          <div class="placeholder">配图占位</div>
+        </div>
+        <p class="news-summary">European Union introduces stricter regulations for major technology companies operating within its borders.</p>
+        <div class="news-meta">
+          <span>2026-06-17</span>
+          <span> · </span>
+          <a href="#" class="news-link">阅读原文 →</a>
+        </div>
+      </article>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="footer">
+      <p>News Digest · 每日国际要闻中文聚合站</p>
+      <p>来源：Reuters · BBC · Guardian · NYT · Bloomberg 等</p>
+      <p><a href="#">GitHub</a> · <a href="#">RSS</a> · <a href="#">关于</a></p>
+    </footer>
+  </div>
+  
+  <script>
+    // 主题切换功能
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    }
+    
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('theme-icon');
+      icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+    
+    // 初始化主题
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+      } else if (prefersDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        updateThemeIcon('dark');
+      }
+    }
+    
+    // 监听系统主题变化
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('theme')) {
+        const newTheme = e.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        updateThemeIcon(newTheme);
+      }
+    });
+    
+    // 初始化
+    initTheme();
+  </script>
+</body>
+</html>
