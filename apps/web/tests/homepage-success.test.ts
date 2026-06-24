@@ -15,6 +15,10 @@ describe("homepage success build", () => {
 
     execSync(`npm run build -- --outDir ${outDir}`, {
       cwd: appDir,
+      env: {
+        ...process.env,
+        PUBLIC_DIGEST_STATE: "success"
+      },
       stdio: "pipe"
     });
 

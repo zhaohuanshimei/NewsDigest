@@ -3,13 +3,11 @@ import DigestEntryList from "../components/digest/DigestEntryList.astro";
 import DigestHeader from "../components/digest/DigestHeader.astro";
 import EmptyState from "../components/states/EmptyState.astro";
 import ErrorState from "../components/states/ErrorState.astro";
-import { readMockDigestState, SITE_DESCRIPTION, SITE_TITLE } from "../lib/config/site";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../lib/config/site";
 import { loadHomepageDigest } from "../lib/content/getLatestDigest";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const homepageDigest = await loadHomepageDigest(
-  readMockDigestState(import.meta.env.PUBLIC_DIGEST_STATE)
-);
+const homepageDigest = await loadHomepageDigest();
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
