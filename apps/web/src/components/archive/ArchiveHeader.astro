@@ -1,0 +1,13 @@
+---
+interface Props {
+  count: number;
+}
+
+const { count } = Astro.props;
+---
+
+<header class="archive-header">
+  <p class="page-eyebrow">Archive</p>
+  <h1 class="archive-title">Past digest publication dates</h1>
+  <p class="archive-description">{count} published digests currently listed.</p>
+</header>

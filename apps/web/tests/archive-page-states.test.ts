@@ -8,8 +8,8 @@ import { describe, expect, it } from "vitest";
 const testDir = dirname(fileURLToPath(import.meta.url));
 const appDir = resolve(testDir, "..");
 
-function buildAndRead(state: "empty" | "error"): string {
-  const outDir = `dist-${state}`;
+function buildArchiveAndRead(state: "empty" | "error"): string {
+  const outDir = `dist-archive-${state}`;
 
   rmSync(resolve(appDir, outDir), { force: true, recursive: true });
 
@@ -17,24 +17,24 @@ function buildAndRead(state: "empty" | "error"): string {
     cwd: appDir,
     env: {
       ...process.env,
-      PUBLIC_DIGEST_STATE: state
+      PUBLIC_ARCHIVE_STATE: state
     },
     stdio: "pipe"
   });
 
-  return readFileSync(resolve(appDir, outDir, "index.html"), "utf8");
+  return readFileSync(resolve(appDir, outDir, "archive/index.html"), "utf8");
 }
 
-describe("homepage alternate states", () => {
+describe("archive page alternate states", () => {
   it("renders an empty-state message", () => {
-    const html = buildAndRead("empty");
+    const html = buildArchiveAndRead("empty");
 
     expect(html).toContain("No digest published yet.");
   }, 20_000);
 
   it("renders an error-state message", () => {
-    const html = buildAndRead("error");
+    const html = buildArchiveAndRead("error");
 
-    expect(html).toContain("Latest digest is temporarily unavailable.");
+    expect(html).toContain("Unable to load archive dates.");
   }, 20_000);
 });

@@ -1,0 +1,13 @@
+---
+import ArchiveDateItem from "./ArchiveDateItem.astro";
+
+interface Props {
+  dates: string[];
+}
+
+const { dates } = Astro.props;
+---
+
+<ul class="archive-date-list" aria-label="Archive dates">
+  {dates.map((date) => <ArchiveDateItem date={date} />)}
+</ul>

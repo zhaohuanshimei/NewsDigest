@@ -1,0 +1,11 @@
+---
+interface Props {
+  date: string;
+}
+
+const { date } = Astro.props;
+---
+
+<li class="archive-date-item">
+  <span class="archive-date-label">{date}</span>
+</li>

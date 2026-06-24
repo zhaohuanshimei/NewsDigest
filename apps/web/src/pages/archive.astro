@@ -1,0 +1,28 @@
+---
+import ArchiveDateList from "../components/archive/ArchiveDateList.astro";
+import ArchiveHeader from "../components/archive/ArchiveHeader.astro";
+import EmptyState from "../components/states/EmptyState.astro";
+import ErrorState from "../components/states/ErrorState.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../lib/config/site";
+import { loadArchiveDates } from "../lib/content/getArchiveDates";
+
+const archiveState = await loadArchiveDates();
+---
+
+<BaseLayout title={`${SITE_TITLE} Archive`} description={SITE_DESCRIPTION}>
+  <main class="page-shell">
+    {
+      archiveState.kind === "success" ? (
+        <section class="archive-surface" aria-label="Archive dates">
+          <ArchiveHeader count={archiveState.dates.length} />
+          <ArchiveDateList dates={archiveState.dates} />
+        </section>
+      ) : archiveState.kind === "empty" ? (
+        <EmptyState />
+      ) : (
+        <ErrorState message={archiveState.message} />
+      )
+    }
+  </main>
+</BaseLayout>

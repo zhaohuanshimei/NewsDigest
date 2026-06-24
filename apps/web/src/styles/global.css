@@ -139,6 +139,54 @@ h3 {
   color: var(--muted-text);
 }
 
+.archive-surface {
+  background: var(--surface-background);
+  border: 1px solid var(--surface-border);
+  padding: 2rem 0;
+}
+
+.archive-header {
+  display: grid;
+  gap: 0.8rem;
+  padding: 0 1.5rem 2rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.archive-title {
+  max-width: 18ch;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.archive-description {
+  max-width: 36rem;
+  font-size: 0.98rem;
+  line-height: 1.75;
+  color: var(--muted-text);
+}
+
+.archive-date-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.archive-date-item {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.archive-date-item:last-child {
+  border-bottom: 0;
+}
+
+.archive-date-label {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--headline-text);
+}
+
 @media (min-width: 48rem) {
   .page-shell {
     padding-top: 6rem;
@@ -146,7 +194,9 @@ h3 {
 
   .digest-header,
   .digest-entry,
-  .state-panel {
+  .state-panel,
+  .archive-header,
+  .archive-date-item {
     padding-left: 2rem;
     padding-right: 2rem;
   }
