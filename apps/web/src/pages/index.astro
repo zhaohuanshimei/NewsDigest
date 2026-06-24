@@ -1,20 +1,18 @@
 ---
 import DigestEntryList from "../components/digest/DigestEntryList.astro";
 import DigestHeader from "../components/digest/DigestHeader.astro";
+import EmptyState from "../components/states/EmptyState.astro";
+import ErrorState from "../components/states/ErrorState.astro";
+import { readMockDigestState, SITE_DESCRIPTION, SITE_TITLE } from "../lib/config/site";
 import { loadHomepageDigest } from "../lib/content/getLatestDigest";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const homepageDigest = await loadHomepageDigest("success");
-
-if (homepageDigest.kind !== "success") {
-  throw new Error("Homepage success view requires a latest digest.");
-}
-
-const { digest } = homepageDigest;
-const publishedAtLabel = digest.published_at.replace("T", " ").replace("Z", " UTC");
+const homepageDigest = await loadHomepageDigest(
+  readMockDigestState(import.meta.env.PUBLIC_DIGEST_STATE)
+);
 ---
 
-<BaseLayout title="News Digest" description="A calm daily briefing on the latest global stories.">
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
   <main class="page-shell">
     <section class="page-intro" aria-label="Site introduction">
       <p class="page-eyebrow">News Digest</p>
@@ -24,9 +22,20 @@ const publishedAtLabel = digest.published_at.replace("T", " ").replace("Z", " UT
       </p>
     </section>
 
-    <section class="digest-surface" aria-label="Latest digest">
-      <DigestHeader date={digest.date} publishedAt={publishedAtLabel} />
-      <DigestEntryList entries={digest.entries} />
-    </section>
+    {
+      homepageDigest.kind === "success" ? (
+        <section class="digest-surface" aria-label="Latest digest">
+          <DigestHeader
+            date={homepageDigest.digest.date}
+            publishedAt={homepageDigest.digest.published_at.replace("T", " ").replace("Z", " UTC")}
+          />
+          <DigestEntryList entries={homepageDigest.digest.entries} />
+        </section>
+      ) : homepageDigest.kind === "empty" ? (
+        <EmptyState />
+      ) : (
+        <ErrorState message={homepageDigest.message} />
+      )
+    }
   </main>
 </BaseLayout>

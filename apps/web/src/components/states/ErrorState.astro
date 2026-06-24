@@ -1,0 +1,12 @@
+---
+interface Props {
+  message: string;
+}
+
+const { message } = Astro.props;
+---
+
+<section class="state-panel" aria-live="polite">
+  <h2 class="state-title">Latest digest is temporarily unavailable.</h2>
+  <p class="state-copy">{message}</p>
+</section>

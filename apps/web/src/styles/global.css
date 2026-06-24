@@ -119,13 +119,34 @@ h3 {
   letter-spacing: -0.025em;
 }
 
+.state-panel {
+  background: var(--surface-background);
+  border: 1px solid var(--surface-border);
+  padding: 2rem 1.5rem;
+}
+
+.state-title {
+  margin-bottom: 0.6rem;
+  font-size: clamp(1.45rem, 2.5vw, 1.9rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.state-copy {
+  max-width: 36rem;
+  font-size: 0.98rem;
+  line-height: 1.75;
+  color: var(--muted-text);
+}
+
 @media (min-width: 48rem) {
   .page-shell {
     padding-top: 6rem;
   }
 
   .digest-header,
-  .digest-entry {
+  .digest-entry,
+  .state-panel {
     padding-left: 2rem;
     padding-right: 2rem;
   }
