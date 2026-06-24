@@ -1,0 +1,21 @@
+{
+  "name": "@news-digest/web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "check": "astro check && vitest run"
+  },
+  "dependencies": {
+    "@news-digest/shared-types": "file:../../packages/shared-types",
+    "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}
