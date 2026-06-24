@@ -10,12 +10,13 @@
     "check": "astro check && vitest run"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.9",
     "@news-digest/shared-types": "file:../../packages/shared-types",
     "astro": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "typescript": "^5.9.0",
+    "typescript": "^5.9.3",
     "vitest": "^3.2.0"
   }
 }

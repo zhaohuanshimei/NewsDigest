@@ -1,0 +1,14 @@
+---
+interface Props {
+  date: string;
+  publishedAt: string;
+}
+
+const { date, publishedAt } = Astro.props;
+---
+
+<header class="digest-header">
+  <p class="digest-kicker">Latest digest</p>
+  <h2 class="digest-date">{date}</h2>
+  <p class="digest-published">Published {publishedAt}</p>
+</header>

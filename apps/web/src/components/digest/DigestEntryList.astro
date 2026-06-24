@@ -1,0 +1,15 @@
+---
+import type { DigestResource } from "../../../../../packages/shared-types/src/index.ts";
+
+import DigestEntryItem from "./DigestEntryItem.astro";
+
+interface Props {
+  entries: DigestResource["entries"];
+}
+
+const { entries } = Astro.props;
+---
+
+<div class="digest-entry-list">
+  {entries.map((entry) => <DigestEntryItem entry={entry} />)}
+</div>

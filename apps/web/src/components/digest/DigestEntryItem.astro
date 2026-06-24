@@ -1,0 +1,16 @@
+---
+import type { DigestEntryResource } from "../../../../../packages/shared-types/src/index.ts";
+
+interface Props {
+  entry: DigestEntryResource;
+}
+
+const { entry } = Astro.props;
+---
+
+<article class="digest-entry">
+  <p class="digest-entry-rank">{entry.rank.toString().padStart(2, "0")}</p>
+  <h3 class="digest-entry-headline">{entry.headline}</h3>
+  <p class="digest-entry-summary">{entry.summary}</p>
+  <p class="digest-entry-meta">{entry.source_count} sources</p>
+</article>

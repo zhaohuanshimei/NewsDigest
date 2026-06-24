@@ -1,8 +1,14 @@
 :root {
   color-scheme: light;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: #f8f6f1;
   color: #1f2328;
+  --page-background: #f8f6f1;
+  --surface-background: #fbfaf7;
+  --surface-border: rgba(31, 35, 40, 0.12);
+  --muted-text: #59636e;
+  --headline-text: #11151a;
 }
 
 * {
@@ -12,10 +18,115 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: #f8f6f1;
-  color: #1f2328;
+  background: var(--page-background);
+  color: var(--headline-text);
 }
 
 a {
   color: inherit;
+  text-decoration: none;
+}
+
+p,
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+.page-shell {
+  width: min(100%, 52rem);
+  margin: 0 auto;
+  padding: 5rem 1.5rem 6rem;
+}
+
+.page-intro {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 4rem;
+}
+
+.page-eyebrow,
+.digest-kicker,
+.digest-entry-rank {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-text);
+}
+
+.page-title {
+  max-width: 18ch;
+  font-size: clamp(2.5rem, 6vw, 4.75rem);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+}
+
+.page-description {
+  max-width: 38rem;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--muted-text);
+}
+
+.digest-surface {
+  background: var(--surface-background);
+  border: 1px solid var(--surface-border);
+  padding: 2rem 0;
+}
+
+.digest-header {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0 1.5rem 2rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.digest-date {
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.digest-published,
+.digest-entry-summary,
+.digest-entry-meta {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--muted-text);
+}
+
+.digest-entry-list {
+  display: grid;
+}
+
+.digest-entry {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.digest-entry:last-child {
+  border-bottom: 0;
+}
+
+.digest-entry-headline {
+  max-width: 28ch;
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 48rem) {
+  .page-shell {
+    padding-top: 6rem;
+  }
+
+  .digest-header,
+  .digest-entry {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }

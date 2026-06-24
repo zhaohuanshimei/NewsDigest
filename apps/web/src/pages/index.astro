@@ -1,10 +1,32 @@
 ---
+import DigestEntryList from "../components/digest/DigestEntryList.astro";
+import DigestHeader from "../components/digest/DigestHeader.astro";
+import { loadHomepageDigest } from "../lib/content/getLatestDigest";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const homepageDigest = await loadHomepageDigest("success");
+
+if (homepageDigest.kind !== "success") {
+  throw new Error("Homepage success view requires a latest digest.");
+}
+
+const { digest } = homepageDigest;
+const publishedAtLabel = digest.published_at.replace("T", " ").replace("Z", " UTC");
 ---
 
-<BaseLayout title="News Digest">
-  <main style="padding: 4rem 1.5rem;">
-    <h1>News Digest</h1>
-    <p>Homepage scaffold ready for latest digest rendering.</p>
+<BaseLayout title="News Digest" description="A calm daily briefing on the latest global stories.">
+  <main class="page-shell">
+    <section class="page-intro" aria-label="Site introduction">
+      <p class="page-eyebrow">News Digest</p>
+      <h1 class="page-title">A quiet front page for the day&apos;s essential stories.</h1>
+      <p class="page-description">
+        Read the latest digest in one pass, with ranked clusters and concise summaries.
+      </p>
+    </section>
+
+    <section class="digest-surface" aria-label="Latest digest">
+      <DigestHeader date={digest.date} publishedAt={publishedAtLabel} />
+      <DigestEntryList entries={digest.entries} />
+    </section>
   </main>
 </BaseLayout>
