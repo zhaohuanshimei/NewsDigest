@@ -8,8 +8,10 @@ News Digest V2 is a clean restart of the original project. The new system must b
 
 ## Source Of Truth
 
+- Architecture docs: `docs/architecture/`
 - Business and migration context: `docs/context/`
 - UI direction and design demos: `docs/design/` and `design-demos/`
+- Master development plan: `docs/superpowers/plans/2026-06-23-news-digest-v2-master-plan.md`
 - Restart execution plan: `docs/migration/2026-06-23-news-digest-v2-restart.md`
 - Legacy reference only: `legacy-reference/`
 
