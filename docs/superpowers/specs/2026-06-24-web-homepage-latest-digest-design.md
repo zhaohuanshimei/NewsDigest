@@ -228,7 +228,12 @@ apps/web/
 - `headline`
 - `summary`
 - `source_count`
-- 一个原文入口
+
+说明：
+
+- 当前真实 `DigestEntryResource` 只提供 `headline`、`summary`、`source_count` 等字段，不提供原文 URL 或来源名称
+- 因此首页这轮只展示契约中已稳定存在的字段，不额外伪造原文入口
+- 原文入口与更细粒度来源信息应在后续 digest 契约扩展后再进入首页需求
 
 这轮不要求：
 
