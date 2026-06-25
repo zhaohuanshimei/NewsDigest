@@ -1,0 +1,15 @@
+---
+interface Props {
+  category: string;
+  headline: string;
+  summary: string;
+}
+
+const { category, headline, summary } = Astro.props;
+---
+
+<header class="cluster-header">
+  <p class="page-eyebrow">{category}</p>
+  <h1 class="cluster-title">{headline}</h1>
+  <p class="cluster-summary">{summary}</p>
+</header>

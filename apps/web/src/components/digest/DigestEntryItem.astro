@@ -10,7 +10,9 @@ const { entry } = Astro.props;
 
 <article class="digest-entry">
   <p class="digest-entry-rank">{entry.rank.toString().padStart(2, "0")}</p>
-  <h3 class="digest-entry-headline">{entry.headline}</h3>
+  <h3 class="digest-entry-headline">
+    <a class="digest-entry-link" href={`/clusters/${entry.cluster_id}`}>{entry.headline}</a>
+  </h3>
   <p class="digest-entry-summary">{entry.summary}</p>
   <p class="digest-entry-meta">{entry.source_count} sources</p>
 </article>

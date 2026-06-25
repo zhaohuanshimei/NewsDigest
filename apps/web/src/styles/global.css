@@ -187,6 +187,84 @@ h3 {
   color: var(--headline-text);
 }
 
+.cluster-surface {
+  background: var(--surface-background);
+  border: 1px solid var(--surface-border);
+  padding: 2rem 0;
+}
+
+.cluster-header {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0 1.5rem 2rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.cluster-title {
+  max-width: 22ch;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+.cluster-summary {
+  max-width: 42rem;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--muted-text);
+}
+
+.cluster-meta {
+  display: grid;
+  gap: 1.2rem;
+  margin: 0;
+  padding: 1.6rem 1.5rem 0;
+}
+
+.cluster-meta-row {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.cluster-meta-term {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-text);
+}
+
+.cluster-meta-value {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--headline-text);
+}
+
+.cluster-date-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.cluster-date-item {
+  border: 1px solid var(--surface-border);
+  padding: 0.3rem 0.7rem;
+  font-size: 0.95rem;
+}
+
+.digest-entry-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.digest-entry-link:hover,
+.digest-entry-link:focus-visible {
+  text-decoration: underline;
+}
+
 @media (min-width: 48rem) {
   .page-shell {
     padding-top: 6rem;
@@ -196,7 +274,9 @@ h3 {
   .digest-entry,
   .state-panel,
   .archive-header,
-  .archive-date-item {
+  .archive-date-item,
+  .cluster-header,
+  .cluster-meta {
     padding-left: 2rem;
     padding-right: 2rem;
   }

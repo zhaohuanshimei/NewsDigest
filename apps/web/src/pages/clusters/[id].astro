@@ -1,0 +1,46 @@
+---
+import type { GetStaticPaths } from "astro";
+
+import ClusterDetailHeader from "../../components/cluster/ClusterDetailHeader.astro";
+import ClusterMetaList from "../../components/cluster/ClusterMetaList.astro";
+import ErrorState from "../../components/states/ErrorState.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../../lib/config/site";
+import { loadClusterDetail } from "../../lib/content/getClusterDetail";
+
+export const getStaticPaths = (() => {
+  return [{ params: { id: "cluster-ai-chip-001" } }];
+}) satisfies GetStaticPaths;
+
+const clusterId = Astro.params.id ?? "";
+const clusterState = await loadClusterDetail(clusterId);
+---
+
+<BaseLayout title={`${SITE_TITLE} Cluster`} description={SITE_DESCRIPTION}>
+  <main class="page-shell">
+    {
+      clusterState.kind === "success" ? (
+        <section class="cluster-surface" aria-label="Cluster detail">
+          <ClusterDetailHeader
+            category={clusterState.cluster.category}
+            headline={clusterState.cluster.headline}
+            summary={clusterState.cluster.summary}
+          />
+          <ClusterMetaList
+            sourceCount={clusterState.cluster.source_count}
+            digestDates={clusterState.cluster.digest_dates}
+          />
+        </section>
+      ) : clusterState.kind === "not-found" ? (
+        <section class="state-panel" aria-live="polite">
+          <h2 class="state-title">This cluster is not available.</h2>
+          <p class="state-copy">
+            The requested cluster does not exist or is no longer available.
+          </p>
+        </section>
+      ) : (
+        <ErrorState message={clusterState.message} />
+      )
+    }
+  </main>
+</BaseLayout>

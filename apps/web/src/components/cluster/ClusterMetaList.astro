@@ -1,0 +1,23 @@
+---
+interface Props {
+  sourceCount: number;
+  digestDates: string[];
+}
+
+const { sourceCount, digestDates } = Astro.props;
+---
+
+<dl class="cluster-meta" aria-label="Cluster metadata">
+  <div class="cluster-meta-row">
+    <dt class="cluster-meta-term">Sources</dt>
+    <dd class="cluster-meta-value">{sourceCount} sources</dd>
+  </div>
+  <div class="cluster-meta-row">
+    <dt class="cluster-meta-term">Digest dates</dt>
+    <dd class="cluster-meta-value">
+      <ul class="cluster-date-list">
+        {digestDates.map((date) => <li class="cluster-date-item">{date}</li>)}
+      </ul>
+    </dd>
+  </div>
+</dl>
