@@ -6,6 +6,11 @@ V2 共享契约包。
 
 - `HealthResource`
 - `ApiError`
+- `DigestResource`
+- `DigestEntryResource`
+- `ArchiveDateListResource`
+- `ClusterDetailResource`
+- `ArticleDetailResource`
 
 ## 使用方式
 
