@@ -32,4 +32,8 @@ PUBLIC_DIGEST_STATE=error npm run build
 PUBLIC_ARCHIVE_STATE=success npm run build
 PUBLIC_ARCHIVE_STATE=empty npm run build
 PUBLIC_ARCHIVE_STATE=error npm run build
+
+PUBLIC_CLUSTER_STATE=success npm run build
+PUBLIC_CLUSTER_STATE=not-found npm run build
+PUBLIC_CLUSTER_STATE=error npm run build
 ```
