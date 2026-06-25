@@ -13,6 +13,7 @@ News Digest V2 is a clean restart of the original project. The new system must b
 - UI direction and design demos: `docs/design/` and `design-demos/`
 - Master development plan: `docs/superpowers/plans/2026-06-23-news-digest-v2-master-plan.md`
 - Restart execution plan: `docs/migration/2026-06-23-news-digest-v2-restart.md`
+- Parallel tasks board: `docs/superpowers/parallel-tasks.md` — subagent 派单与验收的单一事实来源，每个 agent 必须先读本文件找到自己 Task ID 对应的 section
 - Legacy reference only: `legacy-reference/`
 
 ## Architecture Principles
