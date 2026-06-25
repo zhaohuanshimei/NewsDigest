@@ -1,5 +1,9 @@
 node_modules/
 dist/
+dist-*/
 .venv/
 .env
 .DS_Store
+__pycache__/
+*.pyc
+.trae/
