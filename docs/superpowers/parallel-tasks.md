@@ -1,21 +1,74 @@
 # Parallel Tasks Board
 
-> 本文件是并行任务派单与验收的单一事实来源。subagent 只读本文件中自己任务 ID 对应的 section，不写本文件。派单与状态更新由协调者完成。
+> 本文件是任务派单与验收的单一事实来源。subagent 只读本文件中自己 Task ID 对应的 section，不写本文件。派单与状态更新由协调者完成。
 
 ## 状态约定
 
-- `pending` — 已派单，等待 subagent 执行
-- `in_progress` — subagent 已开始
-- `review` — subagent 已交付 commit，等待验收
+- `pending` — 已派单，等待 agent 执行
+- `in_progress` — agent 已开始
+- `review` — agent 已交付 commit，等待验收
 - `done` — 已验收通过，压缩到"已完成"区
 
-## 当前并行批次（2026-06-25）
+## 当前任务批次（2026-06-25）
 
-### Task E07-SEO
+> **执行方式：线性顺序。** 同一个 agent 按 Task 1 → Task 2 → Task 3 顺序执行，每个 task 独立 commit。完成前一个 task 后才能开始下一个。
+
+---
+
+### Task 1: B02-CONFIG
 
 - **Status:** pending
-- **Owner:** subagent
+- **Owner:** agent
 - **Commit:** (待交付)
+
+#### 任务
+实现 L1-B02 环境变量与配置规范。目标：统一 API、Web、数据库、翻译、调度、部署配置的命名与来源。
+
+#### 上下文文件（先读）
+- docs/architecture/overview.md — 架构总览
+- docs/architecture/non-functional-targets.md — 非功能目标
+- apps/web/src/lib/config/site.ts — 前端现有配置（DEFAULT_API_BASE_URL, readApiBaseUrl, 各种 mock override）
+- apps/web/src/env.d.ts — 前端环境变量类型
+- services/api/app/core/config.py — 后端现有配置（API_PREFIX）
+- services/api/app/core/metadata.py — 后端元信息
+
+#### 可以创建/修改的文件（ONLY these）
+- .env.example — 新建，全项目统一环境变量模板
+- docs/architecture/configuration.md — 新建，配置规范文档
+
+#### 禁碰文件（DO NOT touch）
+- 所有 apps/ 下的代码文件
+- 所有 services/ 下的代码文件
+- 所有 packages/ 下的代码文件
+- apps/web/src/env.d.ts
+- apps/web/src/lib/config/site.ts
+- services/api/app/core/config.py
+- 任何其他 docs/ 下的文件（只新建 configuration.md，不改其他）
+
+#### 实现要求
+1. `.env.example` 覆盖：API 服务端口、数据库连接、翻译 API key 占位、前端 API base URL、各环境差异说明
+2. 开发、测试、预发、生产四类环境的差异明确（用注释分组）
+3. 不把真实密钥写入文件，只用占位符
+4. `docs/architecture/configuration.md` 说明：变量命名规范、来源优先级、各环境差异、密钥管理原则
+5. 文档里引用的变量名必须和现有代码里实际使用的一致（`PUBLIC_DIGEST_STATE`, `PUBLIC_ARCHIVE_STATE`, `PUBLIC_CLUSTER_STATE`, `NEWS_DIGEST_API_BASE_URL`, `API_PREFIX`）
+
+#### 完成后
+这个任务不涉及代码，无需跑测试。确认文档和 `.env.example` 写好后直接 commit。
+
+#### commit 格式
+```
+git add .env.example docs/architecture/configuration.md
+git commit -m "docs: add environment configuration spec and env example"
+```
+
+---
+
+### Task 2: E07-SEO
+
+- **Status:** pending
+- **Owner:** agent
+- **Commit:** (待交付)
+- **Depends on:** Task 1 完成后开始
 
 #### 任务
 实现 L1-E07 SEO 基础面。目标：为首页、归档页、cluster 详情页建立 meta、Open Graph、Twitter Card、robots.txt、sitemap.xml、JSON-LD 基础。
@@ -68,11 +121,12 @@ git commit -m "feat: add seo meta sitemap and robots"
 
 ---
 
-### Task E08-RSS
+### Task 3: E08-RSS
 
 - **Status:** pending
-- **Owner:** subagent
+- **Owner:** agent
 - **Commit:** (待交付)
+- **Depends on:** Task 2 完成后开始
 
 #### 任务
 实现 L1-E08 RSS 输出与订阅页。目标：恢复标准 RSS feed，并独立提供订阅说明页。
@@ -119,54 +173,6 @@ git commit -m "feat: add seo meta sitemap and robots"
 ```
 git add apps/web/src/pages/feed.xml.ts apps/web/src/pages/rss.astro
 git commit -m "feat: add rss feed and subscription page"
-```
-
----
-
-### Task B02-CONFIG
-
-- **Status:** pending
-- **Owner:** subagent
-- **Commit:** (待交付)
-
-#### 任务
-实现 L1-B02 环境变量与配置规范。目标：统一 API、Web、数据库、翻译、调度、部署配置的命名与来源。
-
-#### 上下文文件（先读）
-- docs/architecture/overview.md — 架构总览
-- docs/architecture/non-functional-targets.md — 非功能目标
-- apps/web/src/lib/config/site.ts — 前端现有配置（DEFAULT_API_BASE_URL, readApiBaseUrl, 各种 mock override）
-- apps/web/src/env.d.ts — 前端环境变量类型
-- services/api/app/core/config.py — 后端现有配置（API_PREFIX）
-- services/api/app/core/metadata.py — 后端元信息
-
-#### 可以创建/修改的文件（ONLY these）
-- .env.example — 新建，全项目统一环境变量模板
-- docs/architecture/configuration.md — 新建，配置规范文档
-
-#### 禁碰文件（DO NOT touch）
-- 所有 apps/ 下的代码文件
-- 所有 services/ 下的代码文件
-- 所有 packages/ 下的代码文件
-- apps/web/src/env.d.ts
-- apps/web/src/lib/config/site.ts
-- services/api/app/core/config.py
-- 任何其他 docs/ 下的文件（只新建 configuration.md，不改其他）
-
-#### 实现要求
-1. `.env.example` 覆盖：API 服务端口、数据库连接、翻译 API key 占位、前端 API base URL、各环境差异说明
-2. 开发、测试、预发、生产四类环境的差异明确（用注释分组）
-3. 不把真实密钥写入文件，只用占位符
-4. `docs/architecture/configuration.md` 说明：变量命名规范、来源优先级、各环境差异、密钥管理原则
-5. 文档里引用的变量名必须和现有代码里实际使用的一致（`PUBLIC_DIGEST_STATE`, `PUBLIC_ARCHIVE_STATE`, `PUBLIC_CLUSTER_STATE`, `NEWS_DIGEST_API_BASE_URL`, `API_PREFIX`）
-
-#### 完成后
-这个任务不涉及代码，无需跑测试。确认文档和 `.env.example` 写好后直接 commit。
-
-#### commit 格式
-```
-git add .env.example docs/architecture/configuration.md
-git commit -m "docs: add environment configuration spec and env example"
 ```
 
 ---
