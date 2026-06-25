@@ -1,4 +1,5 @@
 import type { MockArchiveState } from "../content/getArchiveDates";
+import type { MockClusterState } from "../content/getClusterDetail";
 import type { MockDigestState } from "../content/getLatestDigest";
 
 export const SITE_TITLE = "News Digest";
@@ -19,6 +20,16 @@ export function readMockArchiveOverride(
   value: string | undefined
 ): MockArchiveState | undefined {
   if (value === "success" || value === "empty" || value === "error") {
+    return value;
+  }
+
+  return undefined;
+}
+
+export function readMockClusterOverride(
+  value: string | undefined
+): MockClusterState | undefined {
+  if (value === "success" || value === "not-found" || value === "error") {
     return value;
   }
 
