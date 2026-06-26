@@ -11,11 +11,232 @@
 
 ---
 
-## 当前任务批次（2026-06-26）：L1-C09/C10 + L1-D01/D02（P5 第一波）
+## 当前任务批次（2026-06-26）：L1-E01/E02/E06/E09 + L1-B04（P6）
 
-> **执行方式：四路并行。** 四个 task 同时派单给四个独立 agent。各 task 通过已存在的 ORM 模型、service 类和 shared-types 契约解耦，开发阶段用 mock 数据独立测试。
+> **执行方式：五路并行。** 五个 task 同时派单给五个独立 agent。E01/E02/E06/E09 为 Web 剩余功能，B04 为 packages/ui。
 
 > **⚠️ 关键原则：禁止 cross-task 文件冲突。** 每个 task 的 allowed 文件列表互不重叠。如需改不在 allowed 列表里的文件，停止并报告协调者。
+
+---
+
+### Task P6-A: L1-E01 实现应用壳与全局布局
+
+- **Status:** pending
+- **Owner:** (待分配)
+- **Commit:** （待交付）
+
+#### 任务
+建立站点头部、页脚、全局布局、导航和基础元信息入口。
+
+#### 上下文文件（先读）
+- apps/web/src/layouts/ — 现有布局文件
+- apps/web/src/components/ — 现有组件
+- docs/design/ — UI 设计文档
+- docs/architecture/domain-model.md — 领域模型
+
+#### 可以创建/修改的文件
+- apps/web/src/layouts/BaseLayout.astro — **修改**（统一壳层）
+- apps/web/src/components/layout/Header.astro — 新建
+- apps/web/src/components/layout/Footer.astro — 新建
+- apps/web/src/components/layout/Navigation.astro — 新建
+- apps/web/tests/layout.test.ts — 新建
+
+#### 禁碰文件
+- 除上面 5 个文件外的一切文件
+
+#### 实现要求
+1. 首页、归档、详情页共享统一壳层
+2. 导航覆盖 about/archive/rss 等首发入口
+3. 页面有统一的 SEO 基础入口
+4. 单元测试覆盖布局结构
+
+#### 验收检查
+```bash
+cd apps/web && npm test
+```
+
+#### 完成后 commit
+```bash
+git add apps/web/src/layouts/BaseLayout.astro apps/web/src/components/layout/ apps/web/tests/layout.test.ts
+git commit -m "feat: implement app shell and global layout"
+```
+
+---
+
+### Task P6-B: L1-E02 落地设计系统基础组件
+
+- **Status:** pending
+- **Owner:** (待分配)
+- **Commit:** （待交付）
+
+#### 任务
+实现标题层级、按钮、标签、来源标记、卡片、状态组件等基础 UI。
+
+#### 上下文文件（先读）
+- packages/ui/ — UI 包目录（待创建）
+- docs/design/ — UI 设计文档
+- apps/web/src/components/ — 现有组件
+
+#### 可以创建/修改的文件
+- packages/ui/src/components/Button.astro — 新建
+- packages/ui/src/components/Card.astro — 新建
+- packages/ui/src/components/Heading.astro — 新建
+- packages/ui/src/components/Tag.astro — 新建
+- packages/ui/src/components/SourceBadge.astro — 新建
+- packages/ui/src/tokens.css — 新建（设计 token）
+- packages/ui/package.json — 新建
+- apps/web/tests/ui-components.test.ts — 新建
+
+#### 禁碰文件
+- 除上面 8 个文件外的一切文件
+
+#### 实现要求
+1. 基础组件与 token 配套
+2. 组件足以支撑首页和归档页面
+3. 无需每个页面重复定义样式
+4. 单元测试覆盖组件渲染
+
+#### 验收检查
+```bash
+cd apps/web && npm test
+```
+
+#### 完成后 commit
+```bash
+git add packages/ui/ apps/web/tests/ui-components.test.ts
+git commit -m "feat: implement design system base components"
+```
+
+---
+
+### Task P6-C: L1-E06 实现搜索与状态体验
+
+- **Status:** pending
+- **Owner:** (待分配)
+- **Commit:** （待交付）
+
+#### 任务
+补齐搜索、空状态、错误状态、加载状态、无结果状态。
+
+#### 上下文文件（先读）
+- apps/web/src/pages/ — 现有页面
+- apps/web/src/components/ — 现有组件
+- docs/design/ — UI 设计文档
+
+#### 可以创建/修改的文件
+- apps/web/src/components/states/EmptyState.astro — 新建
+- apps/web/src/components/states/ErrorState.astro — 新建
+- apps/web/src/components/states/LoadingState.astro — 新建
+- apps/web/src/components/states/NoResultsState.astro — 新建
+- apps/web/src/components/search/SearchBar.astro — 新建
+- apps/web/tests/states.test.ts — 新建
+
+#### 禁碰文件
+- 除上面 6 个文件外的一切文件
+
+#### 实现要求
+1. 首发搜索可定位 digest 内容、来源或标题
+2. 空、错、无结果三类状态视觉和文案区分清楚
+3. 移动端可用，键盘/快捷键行为可预测
+4. 单元测试覆盖状态组件
+
+#### 验收检查
+```bash
+cd apps/web && npm test
+```
+
+#### 完成后 commit
+```bash
+git add apps/web/src/components/states/ apps/web/src/components/search/ apps/web/tests/states.test.ts
+git commit -m "feat: implement search and state experience"
+```
+
+---
+
+### Task P6-D: L1-E09 完成性能与可访问性打磨
+
+- **Status:** pending
+- **Owner:** (待分配)
+- **Commit:** （待交付）
+
+#### 任务
+让首发版达到既定性能、可访问性与移动端体验目标。
+
+#### 上下文文件（先读）
+- apps/web/src/pages/ — 所有页面
+- apps/web/src/components/ — 所有组件
+- docs/architecture/non-functional-targets.md — 非功能目标
+
+#### 可以创建/修改的文件
+- apps/web/src/styles/accessibility.css — 新建
+- apps/web/src/styles/performance.css — 新建
+- apps/web/tests/accessibility.test.ts — 新建
+- apps/web/tests/performance.test.ts — 新建
+
+#### 禁碰文件
+- 除上面 4 个文件外的一切文件
+
+#### 实现要求
+1. 关键页面的 Lighthouse 达到既定基线
+2. 触控目标、键盘焦点、色彩对比满足基本可访问性要求
+3. 没有明显阻塞首发的性能回归
+4. 单元测试覆盖可访问性和性能检查
+
+#### 验收检查
+```bash
+cd apps/web && npm test
+```
+
+#### 完成后 commit
+```bash
+git add apps/web/src/styles/ apps/web/tests/accessibility.test.ts apps/web/tests/performance.test.ts
+git commit -m "feat: complete performance and accessibility polish"
+```
+
+---
+
+### Task P6-E: L1-B04 初始化 packages/ui
+
+- **Status:** pending
+- **Owner:** (待分配)
+- **Commit:** （待交付）
+
+#### 任务
+建立设计 token、排版、颜色、间距、按钮与基础信息组件规范。
+
+#### 上下文文件（先读）
+- packages/ui/ — UI 包目录（待创建）
+- docs/design/ — UI 设计文档
+- docs/architecture/non-functional-targets.md — 非功能目标
+
+#### 可以创建/修改的文件
+- packages/ui/README.md — 新建
+- packages/ui/package.json — 新建
+- packages/ui/src/index.ts — 新建
+- packages/ui/src/tokens/colors.ts — 新建
+- packages/ui/src/tokens/spacing.ts — 新建
+- packages/ui/src/tokens/typography.ts — 新建
+- packages/ui/src/docs/design-tokens.md — 新建
+
+#### 禁碰文件
+- 除上面 7 个文件外的一切文件
+
+#### 实现要求
+1. packages/ui 至少提供 token 文档与基础导出入口
+2. 字体、颜色、spacing、responsive 断点有统一定义
+3. 能支撑首页、归档、详情页共用的 UI 语言
+4. 文档说明 token 使用方式
+
+#### 验收检查
+```bash
+cd packages/ui && cat README.md
+```
+
+#### 完成后 commit
+```bash
+git add packages/ui/
+git commit -m "feat: initialize packages/ui with design tokens"
+```
 
 ---
 
@@ -263,8 +484,9 @@ git commit -m "feat: implement archive and detail query services"
 | L1-C08 | `a389bad` | DigestGenerator + 幂等生成 + 5 tests |
 | P4 integration | (本提交) | requirements.txt 补 readability-lxml/scikit-learn/scipy |
 | **P5 第一波** | `d43bf0b` | TranslationService (12) + PipelineOrchestrator (8) + DigestQueryService (10) + ArchiveQueryService (12) = 42 tests |
+| **P5 第二波** | `c78b898`~`c607dc1` | HealthService (5) + 路由层切换 (11) + 契约导出 (17) = 33 tests |
 
-**合计：214 后端 pytest + 29 前端 vitest = 243 tests 全部通过 ✅**
+**合计：252 后端 pytest + 29 前端 vitest = 281 tests 全部通过 ✅**
 
 ## 后续批次规划
 
@@ -272,16 +494,16 @@ git commit -m "feat: implement archive and detail query services"
 |------|------|------|
 | ~~P4~~ | ~~C05, C06, C07, C08~~ | ✅ 已完成 — 四路并行交付 |
 | ~~P5 第一波~~ | ~~C09, C10, D01, D02~~ | ✅ 已完成 — 四路并行交付 |
-| **本批（P5 第二波）** | D03, D04, D05 | 健康检查 / 路由层暴露 / 契约导出（依赖第一波） |
-| 再下一批（P6） | E01/E02/E06/E09 + B04 | Web 剩余功能 + packages/ui |
+| ~~P5 第二波~~ | ~~D03, D04, D05~~ | ✅ 已完成 — 三路并行交付 |
+| **本批（P6）** | E01/E02/E06/E09 + B04 | Web 剩余功能 + packages/ui |
 | 最后一批（P7） | F01→F07 | CI/CD、测试基线、部署、监控 |
 
 ### 剩余任务总计
 
 | 阶段 | 剩余任务数 | 说明 |
 |------|-----------|------|
-| ~~P5 第一波（本批）~~ | ~~4~~ | ~~✅ 已完成~~ |
-| **P5 第二波** | **3** | D03, D04, D05 |
-| P6 | ~5 | E01, E02, E06, E09, B04 |
+| ~~P5 第一波~~ | ~~4~~ | ~~✅ 已完成~~ |
+| ~~P5 第二波~~ | ~~3~~ | ~~✅ 已完成~~ |
+| **P6（本批）** | **~5** | E01, E02, E06, E09, B04 |
 | P7 | ~7 | F01-F07 |
-| **合计** | **~15** | 距离 L1 完成约 15 个任务 |
+| **合计** | **~12** | 距离 L1 完成约 12 个任务 |
