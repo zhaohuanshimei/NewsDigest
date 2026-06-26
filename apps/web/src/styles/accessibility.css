@@ -183,6 +183,78 @@ img {
   height: auto;
 }
 
+/* ===== ARIA 角色触控目标 ===== */
+/* 确保 ARIA button 角色也满足触控目标 */
+[role="button"] {
+  display: inline-block;
+  min-height: 44px;
+  min-width: 44px;
+  line-height: 44px;
+  cursor: pointer;
+}
+
+/* ===== 链接视觉区分 ===== */
+/* 已访问和未访问链接需要视觉区分 */
+a:visited {
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ===== 表单元素 accent-color ===== */
+/* 使用系统强调色确保视觉一致性 */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--headline-text, #11151a);
+  min-height: 20px;
+  min-width: 20px;
+}
+
+/* ===== 焦点容器管理 ===== */
+/* 当容器内元素获得焦点时提供视觉反馈 */
+:focus-within {
+  position: relative;
+}
+
+nav:focus-within,
+[role="navigation"]:focus-within {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* ===== 语义标题层级 ===== */
+/* 确保标题层级有适当的视觉区分 */
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.1;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: clamp(1.2rem, 2vw, 1.75rem);
+  line-height: 1.25;
+}
+
+/* ===== 文本间距可访问性 ===== */
+/* 支持用户代理的文本间距覆盖（WCAG 1.4.12） */
+p,
+li,
+dd {
+  line-height: 1.5;
+  max-width: 75ch;
+}
+
+li {
+  margin-bottom: 0.25em;
+}
+
 /* ===== 表格可访问性 ===== */
 table {
   border-collapse: collapse;

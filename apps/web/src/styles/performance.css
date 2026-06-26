@@ -86,6 +86,39 @@ video {
   }
 }
 
+/* ===== 图片渲染优化 ===== */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+img[loading="lazy"] {
+  content-visibility: auto;
+}
+
+/* ===== SVG 渲染优化 ===== */
+svg {
+  overflow: visible;
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+/* ===== 文本大小调整保护 ===== */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ===== 关键资源提示 ===== */
+.page-title,
+.digest-date,
+.cluster-title {
+  contain: content;
+}
+
 /* ===== 减少动画偏好 ===== */
 /* 与 accessibility.css 配合确保性能 */
 @media (prefers-reduced-motion: reduce) {

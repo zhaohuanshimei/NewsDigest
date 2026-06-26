@@ -73,6 +73,24 @@ describe("performance.css", () => {
     expect(performanceCss).toContain("transition: none");
     expect(performanceCss).toContain("animation: none");
   });
+
+  it("optimizes image rendering quality", () => {
+    expect(performanceCss).toContain("image-rendering");
+  });
+
+  it("optimizes SVG rendering", () => {
+    expect(performanceCss).toContain("svg");
+    expect(performanceCss).toContain("overflow: hidden");
+  });
+
+  it("protects against text size adjustment on mobile", () => {
+    expect(performanceCss).toContain("-webkit-text-size-adjust: 100%");
+    expect(performanceCss).toContain("text-size-adjust: 100%");
+  });
+
+  it("uses content-visibility for key elements", () => {
+    expect(performanceCss).toContain("contain: content");
+  });
 });
 
 describe("performance baseline requirements", () => {
@@ -110,5 +128,12 @@ describe("performance baseline requirements", () => {
     expect(performanceCss).toContain("@media (prefers-reduced-motion: reduce)");
     expect(performanceCss).toContain("transition: none");
     expect(performanceCss).toContain("animation: none");
+  });
+
+  it("provides content-visibility optimization for key page elements", () => {
+    expect(performanceCss).toContain(".page-title");
+    expect(performanceCss).toContain(".digest-date");
+    expect(performanceCss).toContain(".cluster-title");
+    expect(performanceCss).toContain("contain: content");
   });
 });

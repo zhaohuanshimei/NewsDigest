@@ -72,6 +72,46 @@ describe("accessibility.css", () => {
     expect(accessibilityCss).toContain("@media (max-width: 48rem)");
     expect(accessibilityCss).toContain("display: block");
   });
+
+  it("provides ARIA role button touch target support", () => {
+    expect(accessibilityCss).toContain('[role="button"]');
+    expect(accessibilityCss).toContain("min-height: 44px");
+    expect(accessibilityCss).toContain("min-width: 44px");
+    expect(accessibilityCss).toContain("cursor: pointer");
+  });
+
+  it("provides visual distinction for link states", () => {
+    expect(accessibilityCss).toContain("a:visited");
+    expect(accessibilityCss).toContain("a:hover");
+    expect(accessibilityCss).toContain("text-decoration: underline");
+    expect(accessibilityCss).toContain("text-underline-offset");
+  });
+
+  it("uses accent-color for form consistency", () => {
+    expect(accessibilityCss).toContain('input[type="checkbox"]');
+    expect(accessibilityCss).toContain('input[type="radio"]');
+    expect(accessibilityCss).toContain("accent-color");
+  });
+
+  it("provides focus-within container management", () => {
+    expect(accessibilityCss).toContain(":focus-within");
+    expect(accessibilityCss).toContain("position: relative");
+    expect(accessibilityCss).toContain('nav:focus-within');
+  });
+
+  it("ensures semantic heading hierarchy with visual distinction", () => {
+    expect(accessibilityCss).toContain("h1");
+    expect(accessibilityCss).toContain("h2");
+    expect(accessibilityCss).toContain("h3");
+    expect(accessibilityCss).toContain("font-size: clamp");
+    expect(accessibilityCss).toContain("line-height");
+  });
+
+  it("supports text spacing accessibility requirements", () => {
+    expect(accessibilityCss).toContain("line-height: 1.5");
+    expect(accessibilityCss).toContain("max-width: 75ch");
+    expect(accessibilityCss).toContain("margin-bottom: 0.25em");
+  });
 });
 
 describe("accessibility requirements", () => {
@@ -105,5 +145,29 @@ describe("accessibility requirements", () => {
     const css = readFileSync(resolve(stylesDir, "accessibility.css"), "utf8");
     expect(css).toContain("@media (prefers-contrast: high)");
     expect(css).toContain("border-width: 2px");
+  });
+
+  it("meets minimum touch target requirements for all interactive elements", () => {
+    const css = readFileSync(resolve(stylesDir, "accessibility.css"), "utf8");
+    expect(css).toContain("min-height: 44px");
+    expect(css).toContain("min-width: 44px");
+    expect(css).toContain('[role="button"]');
+  });
+
+  it("provides accessible text spacing per WCAG 1.4.12", () => {
+    const css = readFileSync(resolve(stylesDir, "accessibility.css"), "utf8");
+    expect(css).toContain("line-height: 1.5");
+    expect(css).toContain("max-width: 75ch");
+  });
+
+  it("ensures semantic heading hierarchy is visually distinct", () => {
+    const css = readFileSync(resolve(stylesDir, "accessibility.css"), "utf8");
+    expect(css).toContain("h1");
+    expect(css).toContain("h2");
+    expect(css).toContain("h3");
+    // Each heading level should have distinct sizing
+    expect(css).toContain("clamp(2rem");
+    expect(css).toContain("clamp(1.5rem");
+    expect(css).toContain("clamp(1.2rem");
   });
 });
