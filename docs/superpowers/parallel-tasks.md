@@ -9,173 +9,206 @@
 - `review` — agent 已交付 commit，等待验收
 - `done` — 已验收通过，压缩到"已完成"区
 
-## 当前任务批次（2026-06-25）
+---
+
+## 当前任务批次（2026-06-26）：L1-C 数据管线
 
 > **执行方式：线性顺序。** 同一个 agent 按 Task 1 → Task 2 → Task 3 顺序执行，每个 task 独立 commit。完成前一个 task 后才能开始下一个。
 
 ---
 
-### Task 1: B02-CONFIG
+### Task 1: L1-C01 数据库 schema 与 migration
 
-- **Status:** done
+- **Status:** pending
 - **Owner:** agent
-- **Commit:** (已完成)
+- **Commit:** （待交付）
 
 #### 任务
-实现 L1-B02 环境变量与配置规范。目标：统一 API、Web、数据库、翻译、调度、部署配置的命名与来源。
+建立 V2 数据库 schema 与首版 Alembic migration。将 V1 已验证的数据结构转化为 V2 SQLAlchemy 模型。
 
 #### 上下文文件（先读）
+- docs/architecture/domain-model.md — 领域模型定义（Source, Article, Cluster, Digest 等实体关系）
 - docs/architecture/overview.md — 架构总览
-- docs/architecture/non-functional-targets.md — 非功能目标
-- apps/web/src/lib/config/site.ts — 前端现有配置（DEFAULT_API_BASE_URL, readApiBaseUrl, 各种 mock override）
-- apps/web/src/env.d.ts — 前端环境变量类型
-- services/api/app/core/config.py — 后端现有配置（API_PREFIX）
-- services/api/app/core/metadata.py — 后端元信息
+- packages/shared-types/src/resources/ — 共享契约中定义的所有 Resource 类型
+- services/api/app/core/config.py — 后端配置（DATABASE_URL 已定义）
+- legacy-reference/ — 参考 V1 的表结构设计
 
-#### 可以创建/修改的文件（ONLY these）
-- .env.example — 新建，全项目统一环境变量模板
-- docs/architecture/configuration.md — 新建，配置规范文档
+#### 可以创建/修改的文件
+- services/api/app/models/ — 新建目录，放 SQLAlchemy ORM 模型
+- services/api/alembic/ — 新建 Alembic 迁移目录
+- services/api/alembic.ini — 新建 Alembic 配置
+- services/api/app/database.py — 新建，数据库会话/引擎管理
+- services/api/app/core/config.py — 修改，增加 DATABASE_URL 读取
+- services/api/requirements.txt — 修改，增加 psycopg2, alembic, sqlalchemy 等依赖
+- services/api/requirements-dev.txt — 修改，同上
 
 #### 禁碰文件（DO NOT touch）
-- 所有 apps/ 下的代码文件
-- 所有 services/ 下的代码文件
-- 所有 packages/ 下的代码文件
-- apps/web/src/env.d.ts
+- apps/web/ 下任何文件
 - apps/web/src/lib/config/site.ts
-- services/api/app/core/config.py
-- 任何其他 docs/ 下的文件（只新建 configuration.md，不改其他）
+- apps/web/src/env.d.ts
+- packages/shared-types/ 下任何文件
+- services/api/app/routers/ 下任何文件
+- services/api/app/schemas/ 下任何文件
+- services/api/app/services/ 下任何文件
+- 任何 docs/ 下除已列出的文件
 
 #### 实现要求
-1. `.env.example` 覆盖：API 服务端口、数据库连接、翻译 API key 占位、前端 API base URL、各环境差异说明
-2. 开发、测试、预发、生产四类环境的差异明确（用注释分组）
-3. 不把真实密钥写入文件，只用占位符
-4. `docs/architecture/configuration.md` 说明：变量命名规范、来源优先级、各环境差异、密钥管理原则
-5. 文档里引用的变量名必须和现有代码里实际使用的一致（`PUBLIC_DIGEST_STATE`, `PUBLIC_ARCHIVE_STATE`, `PUBLIC_CLUSTER_STATE`, `NEWS_DIGEST_API_BASE_URL`, `API_PREFIX`）
+1. 数据表覆盖：sources, articles, translations, clusters, cluster_members, daily_digests
+2. 模型文件放到 `services/api/app/models/`，每个实体一个文件（例如 source.py, article.py, cluster.py, digest.py）
+3. 数据库 session 工具放在 `services/api/app/database.py`
+4. migration 能空库执行成功
+5. schema 与 `docs/architecture/domain-model.md` 对齐
+6. 外键关系、唯一约束、索引按需定义
+7. 每个模型有 `id`、`created_at`、`updated_at` 基础字段
 
-#### 完成后
-这个任务不涉及代码，无需跑测试。确认文档和 `.env.example` 写好后直接 commit。
+#### 验收检查
+```bash
+cd services/api
+# 创建测试数据库
+# 运行 migration
+alembic upgrade head
+# 确认所有表已创建
+# 验证核心字段与 domain model 一致
+```
 
-git add .env.example docs/architecture/configuration.md
-git commit -m "docs: add environment configuration spec and env example"
+#### 完成后 commit
+```bash
+git add services/api/alembic/ services/api/alembic.ini services/api/app/models/ services/api/app/database.py
+git commit -m "feat(db): add ORM models and initial migration"
 ```
 
 ---
 
-### Task 2: E07-SEO
+### Task 2: L1-C02 源配置与加载器 + L1-C03 抓取适配器接口
 
-- **Status:** done
+- **Status:** pending
 - **Owner:** agent
-- **Commit:** (已完成)
+- **Commit:** （待交付）
 - **Depends on:** Task 1 完成后开始
 
 #### 任务
-实现 L1-E07 SEO 基础面。目标：为首页、归档页、cluster 详情页建立 meta、Open Graph、Twitter Card、robots.txt、sitemap.xml、JSON-LD 基础。
+以表驱动方式管理新闻源配置，并为 RSS 抓取与正文爬取定义统一输入输出接口。
 
 #### 上下文文件（先读）
-- apps/web/src/layouts/BaseLayout.astro — 当前布局，props 是 { title, description }
-- apps/web/src/pages/index.astro — 首页
-- apps/web/src/pages/archive.astro — 归档页
-- apps/web/src/pages/clusters/[id].astro — cluster 详情页
-- apps/web/src/lib/config/site.ts — SITE_TITLE, SITE_DESCRIPTION
-- apps/web/astro.config.mjs — Astro 配置
-- apps/web/package.json — 当前依赖
+- services/api/app/models/ （上一步创建的表模型）
+- docs/architecture/domain-model.md — 源（Source）实体定义
+- legacy-reference/ — 参考 V1 的源配置方式和抓取逻辑
 
-#### 可以修改的文件（ONLY these）
-- apps/web/src/layouts/BaseLayout.astro — 加 meta/OG/Twitter Card
-- apps/web/src/pages/index.astro — 加页面级 meta 和 JSON-LD
-- apps/web/src/pages/archive.astro — 加页面级 meta
-- apps/web/src/pages/clusters/[id].astro — 加页面级 meta
-- apps/web/astro.config.mjs — 加 sitemap 集成（@astrojs/sitemap）
-- apps/web/package.json — 加 @astrojs/sitemap 依赖
-- apps/web/public/robots.txt — 新建
+#### 可以创建/修改的文件
+- services/api/app/repositories/source_repository.py — 新建，源的 CRUD 查询
+- services/api/app/services/source_service.py — 新建，源配置管理服务
+- services/api/app/core/fetcher_interface.py — 新建，抓取适配器接口定义
+- services/api/tests/ — 可新建测试
+- services/api/requirements.txt — 可增加依赖（如 feedparser）
 
 #### 禁碰文件（DO NOT touch）
-- apps/web/src/styles/global.css
-- apps/web/src/lib/config/site.ts
-- apps/web/src/lib/content/* （所有 seam 文件）
-- apps/web/src/env.d.ts
-- apps/web/src/components/digest/*
-- apps/web/src/components/cluster/*
-- apps/web/src/components/states/*
-- packages/shared-types/*
-- services/api/*
-- 任何 docs/ 下的文件
+- apps/web/ 下任何文件
+- packages/shared-types/ 下任何文件
+- services/api/app/routers/ 下任何文件
+- services/api/app/schemas/ 下任何文件
+- services/api/app/services/digests.py
+- 任何 docs/ 下文件
 
-#### 验收标准
-1. 首页、归档页、cluster 详情页有正确的 `<title>`、meta description、Open Graph 标签、Twitter Card 标签
-2. `/robots.txt` 可访问且内容合理
-3. `/sitemap.xml` 可访问（通过 @astrojs/sitemap 集成自动生成）
-4. 至少首页有 JSON-LD 结构化数据输出
-5. 构建不报错，现有测试不回归
+#### 实现要求
+1. Source 配置支持：id, name, type(rss/crawler), url, language, enabled, fetch_interval_minutes, last_fetched_at
+2. 至少有一组首发默认源（参考 V1 配置）可通过 seed 函数或初始 migration 加载
+3. 抓取适配器接口清晰区分三个阶段：source fetch → content extract → normalize
+4. 接口定义支持超时、重试、User-Agent 配置
+5. 错误、失败状态有统一表达方式
+6. 有单元测试覆盖
 
-#### 完成后必须运行
-`npm --prefix apps/web run check`，确认全绿后再 commit。
+#### 验收检查
+```bash
+cd services/api
+python -m pytest tests/ -v
+# 确认源 CRUD 和适配器接口测试通过
+```
 
-git add <你改的文件>
-git commit -m "feat: add seo meta sitemap and robots"
+#### 完成后 commit
+```bash
+git add services/api/app/repositories/source_repository.py services/api/app/services/source_service.py services/api/app/core/fetcher_interface.py
+git commit -m "feat: add source config service and fetch adapter interface"
 ```
 
 ---
 
-### Task 3: E08-RSS
+### Task 3: L1-C04 RSS 抓取器
 
-- **Status:** done
+- **Status:** pending
 - **Owner:** agent
-- **Commit:** (已完成)
+- **Commit:** （待交付）
 - **Depends on:** Task 2 完成后开始
 
 #### 任务
-实现 L1-E08 RSS 输出与订阅页。目标：恢复标准 RSS feed，并独立提供订阅说明页。
+实现首发新闻源的 RSS 抓取、标准化文档写入 articles 表。
 
 #### 上下文文件（先读）
-- apps/web/src/pages/index.astro — 首页，了解现有页面结构
-- apps/web/src/layouts/BaseLayout.astro — 布局组件
-- apps/web/src/lib/config/site.ts — SITE_TITLE, SITE_DESCRIPTION, readApiBaseUrl
-- apps/web/src/lib/content/getLatestDigest.ts — 首页 seam，了解如何获取 digest
-- apps/web/src/lib/content/mockDigest.ts — mock 数据结构
-- apps/web/astro.config.mjs — Astro 配置
-- apps/web/package.json — 当前依赖
-- packages/shared-types/src/resources/digest.ts — DigestResource 契约
+- services/api/app/core/fetcher_interface.py （上一步定义的适配器接口）
+- services/api/app/models/source.py, article.py （表定义）
+- services/api/app/repositories/source_repository.py （源查询工具）
+- docs/architecture/domain-model.md — Article 实体定义
+- legacy-reference/ — 参考 V1 的 RSS 抓取实现
 
-#### 可以创建的文件（ONLY these, all new）
-- apps/web/src/pages/feed.xml.ts — RSS feed 端点
-- apps/web/src/pages/rss.astro — 订阅说明页
+#### 可以创建/修改的文件
+- services/api/app/services/fetchers/ — 新建目录
+- services/api/app/services/fetchers/rss_fetcher.py — 新建，RSS 抓取实现
+- services/api/app/services/article_service.py — 新建，文章写入/查询服务
+- services/api/app/repositories/article_repository.py — 新建，文章仓库
+- services/api/tests/ — 可新建测试
+- services/api/requirements.txt — 可增加 feedparser 等依赖
 
 #### 禁碰文件（DO NOT touch）
-- apps/web/astro.config.mjs
-- apps/web/src/styles/global.css
-- apps/web/src/lib/config/site.ts
-- apps/web/src/lib/content/* （所有 seam 文件）
-- apps/web/src/env.d.ts
-- apps/web/src/pages/index.astro
-- apps/web/src/pages/archive.astro
-- apps/web/src/pages/clusters/*
-- apps/web/src/components/*
-- apps/web/src/layouts/*
-- packages/shared-types/*
-- services/api/*
-- 任何 docs/ 下的文件
+- apps/web/ 下任何文件
+- packages/shared-types/ 下任何文件
+- services/api/app/routers/ 下任何文件
+- services/api/app/schemas/ 下任何文件
+- services/api/app/services/digests.py
+- 任何 docs/ 下文件
 
 #### 实现要求
-1. `/feed.xml` 返回合法 XML RSS 2.0 feed，content-type: `application/xml`
-2. feed 内容从 `loadHomepageDigest()` 获取（复用现有 seam），success 时输出条目，empty/error 时返回合法空 feed
-3. `/rss` 提供订阅说明页，使用 BaseLayout，告知用户 feed 地址
-4. 不要 fabricate 原文链接，`DigestEntryResource` 只保证 `headline`/`summary`/`source_count`
+1. 实现 `RssFetcher` 类，遵循 Task 2 定义的抓取适配器接口
+2. 至少一组配置源能成功抓到文章并写入 articles 表
+3. 支持超时、重试、User-Agent 基本配置
+4. 抓取结果包含：标题、URL、摘要、来源 ID、发布时间
+5. 失败不抛异常（记录到日志），不中断批量抓取
+6. 有单元测试覆盖
 
-#### 完成后必须运行
-`npm --prefix apps/web run check`，确认全绿后再 commit。
+#### 验收检查
+```bash
+cd services/api
+python -m pytest tests/ -v
+# 确认 RSS 抓取器能正常解析 feed 并写入数据库
+```
 
-git add apps/web/src/pages/feed.xml.ts apps/web/src/pages/rss.astro
-git commit -m "feat: add rss feed and subscription page"
+#### 完成后 commit
+```bash
+git add services/api/app/services/fetchers/ services/api/app/services/article_service.py services/api/app/repositories/article_repository.py
+git commit -m "feat: implement RSS fetcher and article persistence"
 ```
 
 ---
 
 ## 已完成
 
-| Task | Commit | Note |
-|------|--------|------|
-| B02-CONFIG | `d4a2709` | .env.example + configuration.md |
-| E07-SEO | `997e414` | meta/OG/sitemap/robots/JSON-LD |
-| E08-RSS | `5719627` | feed.xml.ts + rss.astro |
-| Fix: site URL hardcode | `1d125a1` | astro.config.mjs site 字段 + 相对 robots + Astro.site |
+| Task ID | Commit | Note |
+|---------|--------|------|
+| L1-A01～A05 | `(early commits)` | docs/architecture/ 7 篇文档 |
+| L1-B02 | `d4a2709` | .env.example + configuration.md |
+| L1-B03 | `da23858` | shared-types 六大资源契约 |
+| L1-B05 | `40e45bc` | FastAPI 骨架 + 6 路由 |
+| L1-B06 | `(early commits)` | Astro 项目 + pages/layouts |
+| L1-E03 | `a77db8e`~`f395ec2` | 首页 Digest 展示 |
+| L1-E04 | `6e2000a` | 归档列表页面 |
+| L1-E05 | `a77db8e`~`f395ec2` | Cluster 详情页 |
+| L1-E07 | `997e414` | SEO meta/OG/sitemap/robots/JSON-LD |
+| L1-E08 | `5719627` | RSS feed.xml.ts + rss.astro |
+| Fix: site URL | `1d125a1` | astro.config.mjs site + 相对 robots + Astro.site |
+
+## 后续批次规划
+
+| 批次 | 任务 | 说明 |
+|------|------|------|
+| 本批（P3） | C01→C04 | 数据库 schema + 源配置 + RSS 抓取 |
+| 下一批（P4） | C05→C10 + D01→D05 | 正文提取、聚类、日报、API 现实数据 |
+| 再下一批（P5） | E01/E02/E06/E09 + B04 | Web 剩余功能 + packages/ui |
+| 最后一批（P6） | F01→F07 | CI/CD、测试基线、部署、监控 |
