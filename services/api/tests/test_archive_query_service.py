@@ -122,7 +122,7 @@ class TestArchiveDates:
     def test_get_archive_dates_empty(self, archive_service):
         """空数据库返回空列表。"""
         result = archive_service.get_archive_dates()
-        assert result == {"dates": []}
+        assert result == []
 
     def test_get_archive_dates_with_published_digests(self, archive_service, db_session):
         """返回有 published digest 的日期（降序）。"""
@@ -132,9 +132,7 @@ class TestArchiveDates:
         _create_digest_with_entries(db_session, date(2026, 6, 20), [1])
 
         result = archive_service.get_archive_dates()
-        assert result == {
-            "dates": ["2026-06-26", "2026-06-25", "2026-06-20"]
-        }
+        assert result == ["2026-06-26", "2026-06-25", "2026-06-20"]
 
     def test_get_archive_dates_excludes_drafts(self, archive_service, db_session):
         """只返回 published 状态的 digest。"""
@@ -142,7 +140,7 @@ class TestArchiveDates:
         _create_digest_with_entries(db_session, date(2026, 6, 25), [1], status="draft")
 
         result = archive_service.get_archive_dates()
-        assert result == {"dates": ["2026-06-26"]}
+        assert result == ["2026-06-26"]
 
     def test_get_archive_dates_with_limit(self, archive_service, db_session):
         """限制返回数量。"""
@@ -150,7 +148,7 @@ class TestArchiveDates:
             _create_digest_with_entries(db_session, date(2026, 6, 26 - i), [1])
 
         result = archive_service.get_archive_dates(limit=5)
-        assert len(result["dates"]) == 5
+        assert len(result) == 5
 
 
 class TestClusterDetail:

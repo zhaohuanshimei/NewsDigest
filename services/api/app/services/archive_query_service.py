@@ -22,18 +22,13 @@ class ArchiveQueryService:
         self.db = db
         self.repo = ArchiveQueryRepository(db)
 
-    def get_archive_dates(self, limit: int = 30) -> dict[str, Any]:
+    def get_archive_dates(self, limit: int = 30) -> list[str]:
         """获取归档日期列表。
 
-        返回符合 shared-types ArchiveDateListResource 的结构：
-        {
-            "dates": ["2026-06-26", "2026-06-25", ...]
-        }
+        返回 ISO 格式的日期字符串列表，按时间倒序排列。
         """
         dates = self.repo.get_archive_dates(limit=limit)
-        return {
-            "dates": [d.isoformat() for d in dates]
-        }
+        return [d.isoformat() for d in dates]
 
     def get_cluster_detail(self, cluster_id: int) -> dict[str, Any] | None:
         """获取 cluster 详情。

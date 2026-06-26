@@ -1,12 +1,21 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 
+from app.database import get_db
 from app.schemas.article import ArticleDetailResource
-from app.schemas.error import ApiErrorEnvelope
-from app.services.digests import get_article_detail
+from app.schemas.error import ApiErrorEnvelope, ApiError
+from app.services.archive_query_service import ArchiveQueryService
 
 
 router = APIRouter(tags=["articles"])
+
+
+def _error_response(status_code: int, code: str, message: str, request_id: str) -> JSONResponse:
+    envelope = ApiErrorEnvelope(
+        error=ApiError(code=code, message=message, request_id=request_id)
+    )
+    return JSONResponse(status_code=status_code, content=envelope.model_dump())
 
 
 @router.get(
@@ -15,18 +24,19 @@ router = APIRouter(tags=["articles"])
     responses={404: {"model": ApiErrorEnvelope}},
     summary="Get Article Detail",
 )
-def get_article_detail_route(article_id: str) -> ArticleDetailResource | JSONResponse:
-    article = get_article_detail(article_id)
+def get_article_detail_route(
+    article_id: int,
+    db: Session = Depends(get_db)
+) -> ArticleDetailResource | JSONResponse:
+    service = ArchiveQueryService(db)
+    article = service.get_article_detail(article_id)
+
     if article is None:
-        return JSONResponse(
-            status_code=404,
-            content={
-                "error": {
-                    "code": "article_not_found",
-                    "message": "未找到指定文章",
-                    "request_id": "req_static_article_lookup",
-                }
-            },
+        return _error_response(
+            404,
+            "article_not_found",
+            "未找到指定文章",
+            "req_article_detail",
         )
 
-    return article
+    return ArticleDetailResource(**article)
