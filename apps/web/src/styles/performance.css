@@ -1,0 +1,98 @@
+/* Performance Optimizations
+ * 优化首屏加载性能
+ * 减少布局偏移,优化渲染性能
+ *
+ * 注意：本文件不覆盖已有样式变量，仅提供增量优化
+ */
+
+/* ===== 布局稳定性 ===== */
+/* 防止 CLS (Cumulative Layout Shift) */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== 内容包含策略 ===== */
+/* 使用 contain 优化渲染性能 - 使用安全的 paint/style 而非 strict */
+.digest-entry,
+.archive-date-item {
+  contain: style paint;
+}
+
+/* ===== 文本渲染优化 ===== */
+/* 优化文本渲染性能 */
+.page-title,
+.digest-date,
+.cluster-title,
+.digest-entry-headline {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== 优化滚动性能 ===== */
+.page-shell {
+  overflow-x: hidden;
+}
+
+/* ===== 优化列表渲染 ===== */
+/* 避免 list-style 重复计算 */
+.archive-date-list,
+.digest-entry-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== 减少动画重绘 ===== */
+/* 确保过渡使用 GPU 友好的属性 */
+.digest-entry-link {
+  transition: none;
+}
+
+/* ===== 移动端性能优化 ===== */
+@media (max-width: 48rem) {
+  /* 优化触摸滚动 */
+  body {
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* ===== 打印样式优化 ===== */
+@media print {
+  /* 移除不必要的装饰性样式 */
+  .digest-surface,
+  .archive-surface,
+  .cluster-surface,
+  .state-panel {
+    border: none;
+    background: none;
+  }
+
+  /* 优化打印布局 */
+  .page-shell {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* 避免分页断裂 */
+  .digest-entry,
+  .archive-date-item {
+    page-break-inside: avoid;
+  }
+}
+
+/* ===== 减少动画偏好 ===== */
+/* 与 accessibility.css 配合确保性能 */
+@media (prefers-reduced-motion: reduce) {
+  .digest-entry,
+  .archive-date-item,
+  .digest-entry-link {
+    transition: none;
+    animation: none;
+  }
+}
