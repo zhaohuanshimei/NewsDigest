@@ -7,6 +7,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "test": "vitest run",
+    "test:e2e": "playwright test --config=playwright.config.ts",
     "check": "astro check && vitest run"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "astro": "^5.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@types/node": "^24.0.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.0"
