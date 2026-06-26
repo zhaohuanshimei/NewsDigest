@@ -54,12 +54,14 @@ test.describe("E2E main flow", () => {
 
   test("5. RSS feed XML returns valid content", async ({ page }) => {
     const response = await page.goto("/feed.xml");
+    expect(response).not.toBeNull();
+    const r = response!;
 
     // Verify it's served as XML
-    expect(response.headers()["content-type"]).toMatch(/xml/);
+    expect(r.headers()["content-type"]).toMatch(/xml/);
 
     // Read the raw response body
-    const body = await response.text();
+    const body = await r.text();
     expect(body).toContain('<?xml version="1.0"');
     expect(body).toContain("<rss");
     expect(body).toContain("<channel>");
@@ -86,7 +88,8 @@ test.describe("E2E main flow", () => {
 
     // Step 5: Check feed XML
     const response = await page.goto("/feed.xml");
-    const body = await response.text();
+    expect(response).not.toBeNull();
+    const body = await response!.text();
     expect(body).toContain("<channel>");
     expect(body).toContain("AI 芯片与模型基础设施继续升温");
   });
