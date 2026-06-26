@@ -478,12 +478,13 @@ git commit -m "feat: implement archive and detail query services"
 | L1-C06 | `7884796` | ArticleNormalizer + URL 清洗 + 去重 + 30 tests |
 | L1-C07 | `9ad748d` | ClusterService + TF-IDF + cosine similarity + 12 tests |
 | L1-C08 | `a389bad` | DigestGenerator + 幂等生成 + 5 tests |
-| P4 integration | (本提交) | requirements.txt 补 readability-lxml/scikit-learn/scipy |
-| **P5 第一波** | `d43bf0b` | TranslationService (12) + PipelineOrchestrator (8) + DigestQueryService (10) + ArchiveQueryService (12) = 42 tests |
+| P4 integration | `032a794` | requirements.txt 补 readability-lxml/scikit-learn/scipy |
+| **P5 第一波** | `d43bf0b` | TranslationService (12) + PipelineOrchestrator (10) + DigestQueryService (8) + ArchiveQueryService (12) = 42 tests |
 | **P5 第二波** | `c78b898`~`c607dc1` | HealthService (5) + 路由层切换 (11) + 契约导出 (17) = 33 tests |
-| **P6** | `b1ebc7c`~`7e2ab65` | 应用壳 (3) + 设计系统 (14) + 搜索状态 (28) + 性能可访问性 (14) + packages/ui = 167 tests |
+| **P6** | `b1ebc7c`~`7e2ab65` | 应用壳 (3) + 设计系统 (14) + 搜索状态 (28) + 性能可访问性 (14) + packages/ui |
+| P5/P6 验收修复 | (本提交) | structlog 加入 requirements + pipeline UTC 修复 + DigestEntry import 补全 |
 
-**合计：252 后端 pytest + 167 前端 vitest = 419 tests 全部通过 ✅**
+**合计：233 后端 pytest + 167 前端 vitest = 400 tests 全部通过 ✅**
 
 ## 后续批次规划
 

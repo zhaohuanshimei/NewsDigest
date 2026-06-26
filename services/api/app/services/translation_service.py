@@ -13,6 +13,7 @@ from abc import ABC, abstractmethod
 import structlog
 from sqlalchemy.orm import Session
 
+from app.models.digest_entry import DigestEntry
 from app.repositories.translation_repository import TranslationRepository
 
 logger = structlog.get_logger()

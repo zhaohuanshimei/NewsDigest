@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Protocol
 
 import structlog
@@ -60,7 +60,7 @@ class PipelineOrchestrator:
 
         幂等性依赖底层 service 的幂等实现。
         """
-        started_at = datetime.now()
+        started_at = datetime.now(timezone.utc)
         result = PipelineResult(started_at=started_at, finished_at=started_at)
         yesterday = target_date - timedelta(days=1)
 
@@ -106,7 +106,7 @@ class PipelineOrchestrator:
         except Exception as exc:
             logger.error("pipeline_unexpected_error", error=str(exc), exc_info=True)
 
-        result.finished_at = datetime.now()
+        result.finished_at = datetime.now(timezone.utc)
         logger.info(
             "pipeline_completed",
             target_date=target_date.isoformat(),
