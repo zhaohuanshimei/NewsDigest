@@ -17,9 +17,9 @@
 
 ### Task 1: B02-CONFIG
 
-- **Status:** pending
+- **Status:** done
 - **Owner:** agent
-- **Commit:** (待交付)
+- **Commit:** (已完成)
 
 #### 任务
 实现 L1-B02 环境变量与配置规范。目标：统一 API、Web、数据库、翻译、调度、部署配置的命名与来源。
@@ -55,8 +55,6 @@
 #### 完成后
 这个任务不涉及代码，无需跑测试。确认文档和 `.env.example` 写好后直接 commit。
 
-#### commit 格式
-```
 git add .env.example docs/architecture/configuration.md
 git commit -m "docs: add environment configuration spec and env example"
 ```
@@ -65,9 +63,9 @@ git commit -m "docs: add environment configuration spec and env example"
 
 ### Task 2: E07-SEO
 
-- **Status:** pending
+- **Status:** done
 - **Owner:** agent
-- **Commit:** (待交付)
+- **Commit:** (已完成)
 - **Depends on:** Task 1 完成后开始
 
 #### 任务
@@ -113,8 +111,6 @@ git commit -m "docs: add environment configuration spec and env example"
 #### 完成后必须运行
 `npm --prefix apps/web run check`，确认全绿后再 commit。
 
-#### commit 格式
-```
 git add <你改的文件>
 git commit -m "feat: add seo meta sitemap and robots"
 ```
@@ -123,9 +119,9 @@ git commit -m "feat: add seo meta sitemap and robots"
 
 ### Task 3: E08-RSS
 
-- **Status:** pending
+- **Status:** done
 - **Owner:** agent
-- **Commit:** (待交付)
+- **Commit:** (已完成)
 - **Depends on:** Task 2 完成后开始
 
 #### 任务
@@ -169,8 +165,6 @@ git commit -m "feat: add seo meta sitemap and robots"
 #### 完成后必须运行
 `npm --prefix apps/web run check`，确认全绿后再 commit。
 
-#### commit 格式
-```
 git add apps/web/src/pages/feed.xml.ts apps/web/src/pages/rss.astro
 git commit -m "feat: add rss feed and subscription page"
 ```
