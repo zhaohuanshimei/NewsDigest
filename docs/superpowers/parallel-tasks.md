@@ -21,9 +21,9 @@
 
 ### Task P5-A: L1-C09 批量翻译服务
 
-- **Status:** pending
-- **Owner:** (待分配)
-- **Commit:** （待交付）
+- **Status:** done
+- **Owner:** agent-a124e15266c46b3dc
+- **Commit:** `d43bf0b`
 
 #### 任务
 实现 `TranslationService`，对 digest 条目执行标题/摘要批量翻译，保留 fallback 与质量护栏。
@@ -76,9 +76,9 @@ git commit -m "feat: implement batch translation service with provider abstracti
 
 ### Task P5-B: L1-D01 日报读取服务
 
-- **Status:** pending
-- **Owner:** (待分配)
-- **Commit:** （待交付）
+- **Status:** done
+- **Owner:** agent-adf1638c20a80bafe
+- **Commit:** `d43bf0b`
 
 #### 任务
 实现 `DigestQueryService`，向外提供 latest digest 和按日期 digest 的查询能力，返回数据符合 shared-types。
@@ -128,9 +128,9 @@ git commit -m "feat: implement digest query service aligned with shared types"
 
 ### Task P5-C: L1-C10 调度编排任务
 
-- **Status:** pending
-- **Owner:** (待分配)
-- **Commit:** （待交付）
+- **Status:** done
+- **Owner:** agent-a9428756bafdb537d
+- **Commit:** `d43bf0b`
 
 #### 任务
 实现 `PipelineOrchestrator`，把抓取、规范化、聚类、digest、翻译串成稳定可观测的任务链路。
@@ -185,9 +185,9 @@ git commit -m "feat: implement pipeline orchestrator with fault-tolerant steps"
 
 ### Task P5-D: L1-D02 归档与详情读取服务
 
-- **Status:** pending
-- **Owner:** (待分配)
-- **Commit:** （待交付）
+- **Status:** done
+- **Owner:** agent-ae6db212ad86c414e
+- **Commit:** `d43bf0b`
 
 #### 任务
 实现 `ArchiveQueryService`，提供归档日期列表、cluster 详情、article 详情查询能力。
@@ -262,16 +262,17 @@ git commit -m "feat: implement archive and detail query services"
 | L1-C07 | `9ad748d` | ClusterService + TF-IDF + cosine similarity + 12 tests |
 | L1-C08 | `a389bad` | DigestGenerator + 幂等生成 + 5 tests |
 | P4 integration | (本提交) | requirements.txt 补 readability-lxml/scikit-learn/scipy |
+| **P5 第一波** | `d43bf0b` | TranslationService (12) + PipelineOrchestrator (8) + DigestQueryService (10) + ArchiveQueryService (12) = 42 tests |
 
-**合计：172 后端 pytest + 29 前端 vitest = 201 tests 全部通过 ✅**
+**合计：214 后端 pytest + 29 前端 vitest = 243 tests 全部通过 ✅**
 
 ## 后续批次规划
 
 | 批次 | 任务 | 说明 |
 |------|------|------|
 | ~~P4~~ | ~~C05, C06, C07, C08~~ | ✅ 已完成 — 四路并行交付 |
-| **本批（P5 第一波）** | C09, C10, D01, D02 | 四路并行：翻译 / 调度编排 / 日报读取 / 归档详情读取 |
-| P5 第二波 | D03, D04, D05 | 健康检查 / 路由层暴露 / 契约导出（依赖第一波） |
+| ~~P5 第一波~~ | ~~C09, C10, D01, D02~~ | ✅ 已完成 — 四路并行交付 |
+| **本批（P5 第二波）** | D03, D04, D05 | 健康检查 / 路由层暴露 / 契约导出（依赖第一波） |
 | 再下一批（P6） | E01/E02/E06/E09 + B04 | Web 剩余功能 + packages/ui |
 | 最后一批（P7） | F01→F07 | CI/CD、测试基线、部署、监控 |
 
@@ -279,8 +280,8 @@ git commit -m "feat: implement archive and detail query services"
 
 | 阶段 | 剩余任务数 | 说明 |
 |------|-----------|------|
-| P5 第一波（本批） | 4 | C09, C10, D01, D02 |
-| P5 第二波 | 3 | D03, D04, D05 |
+| ~~P5 第一波（本批）~~ | ~~4~~ | ~~✅ 已完成~~ |
+| **P5 第二波** | **3** | D03, D04, D05 |
 | P6 | ~5 | E01, E02, E06, E09, B04 |
 | P7 | ~7 | F01-F07 |
-| **合计** | **~19** | 距离 L1 完成约 19 个任务 |
+| **合计** | **~15** | 距离 L1 完成约 15 个任务 |
