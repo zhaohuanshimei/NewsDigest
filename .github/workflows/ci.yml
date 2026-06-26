@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (API)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: services/api/requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff pytest httpx pytest-asyncio pytest-cov
+      - name: Lint (ruff)
+        run: ruff check .
+      - name: Test (pytest)
+        run: |
+          python -m pytest tests/ -v --tb=short --no-header \
+            --ignore=tests/test_rss_fetcher.py \
+            --ignore=tests/test_content_fetcher.py
+
+  shared-types:
+    name: Shared Types
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/shared-types
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: packages/shared-types/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Type check
+        run: npx tsc --noEmit
+
+  frontend:
+    name: Web (Astro)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Type check (astro)
+        run: npx astro check
+      - name: Test (vitest)
+        run: npm test
+      - name: Build
+        run: npm run build
+        env:
+          PUBLIC_DIGEST_STATE: success
+          PUBLIC_ARCHIVE_STATE: success
+          PUBLIC_CLUSTER_STATE: success

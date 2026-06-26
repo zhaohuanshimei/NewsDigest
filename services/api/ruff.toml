@@ -1,0 +1,7 @@
+target-version = "py313"
+line-length = 120
+
+[lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]
+per-file-ignores = {"alembic/*" = ["W291"], "tests/*" = ["F841"]}

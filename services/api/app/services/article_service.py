@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from time import sleep
 
 from sqlalchemy.orm import Session
 
-from app.core.fetcher_interface import BaseFetcher, FetchError, FetchRequest
+from app.core.fetcher_interface import BaseFetcher, FetchRequest, FetchResult
 from app.models.source import Source
 from app.repositories.article_repository import ArticleRepository
 from app.repositories.source_repository import SourceRepository
