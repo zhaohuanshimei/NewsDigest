@@ -11,19 +11,21 @@
 
 ---
 
-## 当前任务批次（2026-06-26）：L1-E01/E02/E06/E09 + L1-B04（P6）
+## 当前任务批次（2026-06-26）：L1-F01~F07（P7 最后一批）
 
-> **执行方式：五路并行。** 五个 task 同时派单给五个独立 agent。E01/E02/E06/E09 为 Web 剩余功能，B04 为 packages/ui。
+> **执行方式：待规划。** P6 已全部完成，剩余 P7 批次包含 CI/CD、测试基线、部署、监控等任务。
 
 > **⚠️ 关键原则：禁止 cross-task 文件冲突。** 每个 task 的 allowed 文件列表互不重叠。如需改不在 allowed 列表里的文件，停止并报告协调者。
 
 ---
 
+（P7 批次任务详情待补充）
+
 ### Task P6-A: L1-E01 实现应用壳与全局布局
 
-- **Status:** pending
-- **Owner:** (待分配)
-- **Commit:** （待交付）
+- **Status:** done
+- **Owner:** agent-aa385376ca884a8c9
+- **Commit:** `b1ebc7c`
 
 #### 任务
 建立站点头部、页脚、全局布局、导航和基础元信息入口。
@@ -65,9 +67,9 @@ git commit -m "feat: implement app shell and global layout"
 
 ### Task P6-B: L1-E02 落地设计系统基础组件
 
-- **Status:** pending
-- **Owner:** (待分配)
-- **Commit:** （待交付）
+- **Status:** done
+- **Owner:** agent-abcc74f611be039ee
+- **Commit:** `8f44710`
 
 #### 任务
 实现标题层级、按钮、标签、来源标记、卡片、状态组件等基础 UI。
@@ -111,9 +113,9 @@ git commit -m "feat: implement design system base components"
 
 ### Task P6-C: L1-E06 实现搜索与状态体验
 
-- **Status:** pending
-- **Owner:** (待分配)
-- **Commit:** （待交付）
+- **Status:** done
+- **Owner:** agent-ac072c437f88259b3
+- **Commit:** `b1ebc7c` + `1c722a0`
 
 #### 任务
 补齐搜索、空状态、错误状态、加载状态、无结果状态。
@@ -155,9 +157,9 @@ git commit -m "feat: implement search and state experience"
 
 ### Task P6-D: L1-E09 完成性能与可访问性打磨
 
-- **Status:** pending
-- **Owner:** (待分配)
-- **Commit:** （待交付）
+- **Status:** done
+- **Owner:** agent-ac072c437f88259b3
+- **Commit:** `7e2ab65`
 
 #### 任务
 让首发版达到既定性能、可访问性与移动端体验目标。
@@ -197,9 +199,9 @@ git commit -m "feat: complete performance and accessibility polish"
 
 ### Task P6-E: L1-B04 初始化 packages/ui
 
-- **Status:** pending
-- **Owner:** (待分配)
-- **Commit:** （待交付）
+- **Status:** done
+- **Owner:** agent-abca68ce6594a462c
+- **Commit:** `b1dbfa1`
 
 #### 任务
 建立设计 token、排版、颜色、间距、按钮与基础信息组件规范。
@@ -485,8 +487,9 @@ git commit -m "feat: implement archive and detail query services"
 | P4 integration | (本提交) | requirements.txt 补 readability-lxml/scikit-learn/scipy |
 | **P5 第一波** | `d43bf0b` | TranslationService (12) + PipelineOrchestrator (8) + DigestQueryService (10) + ArchiveQueryService (12) = 42 tests |
 | **P5 第二波** | `c78b898`~`c607dc1` | HealthService (5) + 路由层切换 (11) + 契约导出 (17) = 33 tests |
+| **P6** | `b1ebc7c`~`7e2ab65` | 应用壳 (3) + 设计系统 (14) + 搜索状态 (28) + 性能可访问性 (14) + packages/ui = 167 tests |
 
-**合计：252 后端 pytest + 29 前端 vitest = 281 tests 全部通过 ✅**
+**合计：252 后端 pytest + 167 前端 vitest = 419 tests 全部通过 ✅**
 
 ## 后续批次规划
 
@@ -495,8 +498,8 @@ git commit -m "feat: implement archive and detail query services"
 | ~~P4~~ | ~~C05, C06, C07, C08~~ | ✅ 已完成 — 四路并行交付 |
 | ~~P5 第一波~~ | ~~C09, C10, D01, D02~~ | ✅ 已完成 — 四路并行交付 |
 | ~~P5 第二波~~ | ~~D03, D04, D05~~ | ✅ 已完成 — 三路并行交付 |
-| **本批（P6）** | E01/E02/E06/E09 + B04 | Web 剩余功能 + packages/ui |
-| 最后一批（P7） | F01→F07 | CI/CD、测试基线、部署、监控 |
+| ~~P6~~ | ~~E01/E02/E06/E09 + B04~~ | ✅ 已完成 — 五路并行交付 |
+| **最后一批（P7）** | F01→F07 | CI/CD、测试基线、部署、监控 |
 
 ### 剩余任务总计
 
@@ -504,6 +507,6 @@ git commit -m "feat: implement archive and detail query services"
 |------|-----------|------|
 | ~~P5 第一波~~ | ~~4~~ | ~~✅ 已完成~~ |
 | ~~P5 第二波~~ | ~~3~~ | ~~✅ 已完成~~ |
-| **P6（本批）** | **~5** | E01, E02, E06, E09, B04 |
-| P7 | ~7 | F01-F07 |
-| **合计** | **~12** | 距离 L1 完成约 12 个任务 |
+| ~~P6~~ | ~~5~~ | ~~✅ 已完成~~ |
+| **P7（最后一批）** | **~7** | F01-F07 |
+| **合计** | **~7** | 距离 L1 完成约 7 个任务 |
