@@ -173,4 +173,9 @@ git commit -m "feat: add rss feed and subscription page"
 
 ## 已完成
 
-（暂无）
+| Task | Commit | Note |
+|------|--------|------|
+| B02-CONFIG | `d4a2709` | .env.example + configuration.md |
+| E07-SEO | `997e414` | meta/OG/sitemap/robots/JSON-LD |
+| E08-RSS | `5719627` | feed.xml.ts + rss.astro |
+| Fix: site URL hardcode | （待修复后 commit） | astro.config.mjs site 字段 + 相对 robots + Astro.site |

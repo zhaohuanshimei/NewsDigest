@@ -9,12 +9,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 const homepageDigest = await loadHomepageDigest();
 
+const siteUrl = Astro.site?.origin ?? "https://newsdigest.app";
 const jsonLd = homepageDigest.kind === "success" ? {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": SITE_TITLE,
   "description": SITE_DESCRIPTION,
-  "url": "https://newsdigest.app",
+  "url": siteUrl,
   "datePublished": homepageDigest.digest.published_at,
   "inLanguage": "en"
 } : null;

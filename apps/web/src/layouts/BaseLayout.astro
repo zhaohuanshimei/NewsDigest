@@ -15,7 +15,7 @@ const {
   ogImage,
 } = Astro.props;
 
-const siteUrl = "https://newsdigest.app";
+const siteUrl = Astro.site ? new URL(Astro.site).origin : "https://newsdigest.app";
 const canonicalUrl = `${siteUrl}${canonicalPath}`;
 const ogImageUrl = ogImage ?? `${siteUrl}/og-default.png`;
 ---
