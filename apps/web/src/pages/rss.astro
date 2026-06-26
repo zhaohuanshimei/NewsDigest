@@ -1,0 +1,90 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_TITLE } from "../lib/config/site";
+
+const pageTitle = "RSS 订阅";
+---
+
+<BaseLayout title={`${pageTitle} | ${SITE_TITLE}`}>
+  <main class="page-shell">
+    <article class="prose">
+      <h1>{pageTitle}</h1>
+
+      <p>
+        你可以通过 RSS 订阅我们的每日新闻摘要。将下面的地址添加到你的 RSS 阅读器中即可开始订阅。
+      </p>
+
+      <section>
+        <h2>订阅地址</h2>
+        <p>
+          <code><a href="/feed.xml">/feed.xml</a></code>
+        </p>
+      </section>
+
+      <section>
+        <h2>什么是 RSS？</h2>
+        <p>
+          RSS（Really Simple Syndication）是一种标准化的内容分发格式，让你可以在自己喜欢的阅读器中接收网站的最新更新，而无需频繁访问网站。
+        </p>
+      </section>
+
+      <section>
+        <h2>如何使用？</h2>
+        <ol>
+          <li>选择一个 RSS 阅读器（如 Feedly、Inoreader、NetNewsWire 等）</li>
+          <li>复制上面的订阅地址</li>
+          <li>在阅读器中添加新的订阅源</li>
+          <li>完成！你将自动接收每日新闻摘要更新</li>
+        </ol>
+      </section>
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .prose {
+    max-width: 65ch;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .prose h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .prose h2 {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .prose p {
+    margin-bottom: 1rem;
+  }
+
+  .prose ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .prose li {
+    margin-bottom: 0.5rem;
+  }
+
+  .prose code {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  .prose a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .prose a:hover {
+    text-decoration: none;
+  }
+</style>
