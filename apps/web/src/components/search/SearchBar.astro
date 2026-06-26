@@ -1,0 +1,191 @@
+---
+interface Props {
+  placeholder?: string;
+  initialValue?: string;
+}
+
+// Client-side search bar for filtering digest content
+// Searches by headline, summary, and source
+const {
+  placeholder = "Search digest entries...",
+  initialValue = ""
+} = Astro.props;
+---
+
+<div class="search-bar" role="search" aria-label="Search digest content">
+  <input
+    type="search"
+    class="search-bar-input"
+    placeholder={placeholder}
+    value={initialValue}
+    aria-label="Search digest entries"
+    autocomplete="off"
+    spellcheck="false"
+  />
+  <button
+    type="button"
+    class="search-bar-clear"
+    aria-label="Clear search"
+    hidden
+  >
+    Clear
+  </button>
+</div>
+
+<script>
+  class DigestSearch {
+    private input: HTMLInputElement;
+    private clearButton: HTMLButtonElement;
+    private debounceTimer: number | undefined;
+
+    constructor(input: HTMLInputElement) {
+      this.input = input;
+      this.clearButton = input.parentElement!.querySelector('.search-bar-clear')!;
+
+      this.bindEvents();
+      this.updateClearButton();
+    }
+
+    private bindEvents() {
+      // Handle input with debounce
+      this.input.addEventListener('input', () => {
+        this.updateClearButton();
+        this.debounce(() => this.emitSearch(), 300);
+      });
+
+      // Handle clear button
+      this.clearButton.addEventListener('click', () => {
+        this.input.value = '';
+        this.updateClearButton();
+        this.emitSearch();
+        this.input.focus();
+      });
+
+      // Handle keyboard shortcuts
+      this.input.addEventListener('keydown', (e) => {
+        // Escape to clear and blur
+        if (e.key === 'Escape') {
+          if (this.input.value) {
+            this.input.value = '';
+            this.updateClearButton();
+            this.emitSearch();
+          } else {
+            this.input.blur();
+          }
+        }
+
+        // Enter to submit (prevent form submission)
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.emitSearch();
+        }
+      });
+
+      // Global keyboard shortcut: / to focus search
+      document.addEventListener('keydown', (e) => {
+        if (e.key === '/' && !this.isInputFocused()) {
+          e.preventDefault();
+          this.input.focus();
+          this.input.select();
+        }
+      });
+    }
+
+    private updateClearButton() {
+      const hasValue = this.input.value.length > 0;
+      this.clearButton.hidden = !hasValue;
+    }
+
+    private debounce(fn: () => void, delay: number) {
+      if (this.debounceTimer !== undefined) {
+        window.clearTimeout(this.debounceTimer);
+      }
+      this.debounceTimer = window.setTimeout(fn, delay);
+    }
+
+    private emitSearch() {
+      const query = this.input.value.trim().toLowerCase();
+      const event = new CustomEvent('digest-search', {
+        detail: { query },
+        bubbles: true
+      });
+      this.input.dispatchEvent(event);
+    }
+
+    private isInputFocused(): boolean {
+      const activeElement = document.activeElement;
+      return activeElement instanceof HTMLInputElement ||
+             activeElement instanceof HTMLTextAreaElement;
+    }
+  }
+
+  // Initialize search on all search bars
+  document.querySelectorAll('.search-bar-input').forEach((input) => {
+    new DigestSearch(input as HTMLInputElement);
+  });
+</script>
+
+<style>
+  .search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-bar-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    background: var(--surface-background);
+    border: 1px solid var(--surface-border);
+    color: var(--headline-text);
+    transition: border-color 0.15s ease;
+  }
+
+  .search-bar-input::placeholder {
+    color: var(--muted-text);
+    opacity: 0.7;
+  }
+
+  .search-bar-input:focus {
+    outline: none;
+    border-color: var(--headline-text);
+  }
+
+  .search-bar-clear {
+    position: absolute;
+    right: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+    font-family: inherit;
+    background: transparent;
+    border: 1px solid var(--surface-border);
+    color: var(--muted-text);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .search-bar-clear:hover,
+  .search-bar-clear:focus-visible {
+    background: var(--page-background);
+    color: var(--headline-text);
+    border-color: var(--headline-text);
+  }
+
+  .search-bar-clear:active {
+    transform: translateY(1px);
+  }
+
+  @media (min-width: 48rem) {
+    .search-bar {
+      margin-bottom: 2rem;
+    }
+
+    .search-bar-input {
+      padding: 0.85rem 1.25rem;
+      font-size: 1.05rem;
+    }
+  }
+</style>

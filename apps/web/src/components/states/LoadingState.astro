@@ -1,0 +1,68 @@
+---
+// Loading state for async operations
+// Used when digest data is being fetched
+---
+
+<section class="state-panel state-loading" aria-live="polite" role="status">
+  <div class="state-loading-indicator" aria-hidden="true">
+    <div class="state-loading-dot"></div>
+    <div class="state-loading-dot"></div>
+    <div class="state-loading-dot"></div>
+  </div>
+  <h2 class="state-title">Loading digest content</h2>
+  <p class="state-copy">Please wait while we fetch the latest stories.</p>
+</section>
+
+<style>
+  .state-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 3rem 1.5rem;
+  }
+
+  .state-loading-indicator {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .state-loading-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--muted-text);
+    animation: state-loading-pulse 1.4s infinite ease-in-out both;
+  }
+
+  .state-loading-dot:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+
+  .state-loading-dot:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+
+  @keyframes state-loading-pulse {
+    0%, 80%, 100% {
+      transform: scale(0.6);
+      opacity: 0.5;
+    }
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .state-loading .state-title {
+    margin-bottom: 0.6rem;
+  }
+
+  @media (min-width: 48rem) {
+    .state-loading {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+</style>

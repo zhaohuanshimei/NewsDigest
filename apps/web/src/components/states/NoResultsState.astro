@@ -1,0 +1,79 @@
+---
+interface Props {
+  query?: string;
+}
+
+// No results state - shown when search returns no matches
+const { query = "" } = Astro.props;
+---
+
+<section class="state-panel state-no-results" aria-live="polite">
+  <h2 class="state-title">No results found{query ? ` for "${query}"` : ""}</h2>
+  <p class="state-copy">
+    {query
+      ? "We couldn't find any digest entries matching your search. Try different keywords or check the archive for older content."
+      : "Your search didn't return any matches. Try adjusting your search terms."}
+  </p>
+  <div class="state-no-results-hint">
+    <p>Search tips:</p>
+    <ul>
+      <li>Check for typos</li>
+      <li>Try more general terms</li>
+      <li>Use fewer keywords</li>
+      <li>Browse the <a href="/archive">archive</a> for older digests</li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .state-no-results {
+    padding: 2rem 1.5rem;
+  }
+
+  .state-no-results .state-title {
+    margin-bottom: 0.6rem;
+  }
+
+  .state-no-results-hint {
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--page-background);
+    border: 1px solid var(--surface-border);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--muted-text);
+  }
+
+  .state-no-results-hint p {
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+    color: var(--headline-text);
+  }
+
+  .state-no-results-hint ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+
+  .state-no-results-hint li {
+    margin: 0.25rem 0;
+  }
+
+  .state-no-results-hint a {
+    color: var(--headline-text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .state-no-results-hint a:hover,
+  .state-no-results-hint a:focus-visible {
+    text-decoration-thickness: 2px;
+  }
+
+  @media (min-width: 48rem) {
+    .state-no-results {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+</style>

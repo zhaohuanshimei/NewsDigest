@@ -1,0 +1,66 @@
+---
+import { SITE_TITLE } from "../../lib/config/site";
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer-inner">
+    <p class="site-footer-copy">
+      &copy; {currentYear} {SITE_TITLE}. All rights reserved.
+    </p>
+    <nav class="site-footer-nav" aria-label="Footer navigation">
+      <a href="/archive" class="site-footer-link">Archive</a>
+      <a href="/rss" class="site-footer-link">RSS</a>
+      <a href="/about" class="site-footer-link">About</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--surface-border);
+    margin-top: auto;
+  }
+
+  .site-footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: min(100%, 52rem);
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .site-footer-copy {
+    font-size: 0.8rem;
+    color: var(--muted-text);
+  }
+
+  .site-footer-nav {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  .site-footer-link {
+    font-size: 0.8rem;
+    color: var(--muted-text);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .site-footer-link:hover,
+  .site-footer-link:focus-visible {
+    color: var(--headline-text);
+  }
+
+  @media (min-width: 48rem) {
+    .site-footer-inner {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+</style>

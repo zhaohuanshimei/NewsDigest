@@ -1,0 +1,46 @@
+---
+import { SITE_TITLE } from "../../lib/config/site";
+---
+
+<header class="site-header" role="banner">
+  <div class="site-header-inner">
+    <a href="/" class="site-header-home" aria-label={`${SITE_TITLE} home`}>
+      <span class="site-header-title">{SITE_TITLE}</span>
+    </a>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--surface-border);
+    background: var(--page-background);
+  }
+
+  .site-header-inner {
+    display: flex;
+    align-items: center;
+    width: min(100%, 52rem);
+    margin: 0 auto;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .site-header-home {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--headline-text);
+    text-decoration: none;
+  }
+
+  .site-header-title {
+    line-height: 1;
+  }
+
+  @media (min-width: 48rem) {
+    .site-header-inner {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+</style>
