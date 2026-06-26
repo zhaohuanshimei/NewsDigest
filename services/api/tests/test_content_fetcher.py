@@ -3,7 +3,6 @@ from __future__ import annotations
 import urllib.error
 from unittest.mock import MagicMock, patch
 
-import pytest
 
 from app.core.fetcher_interface import (
     ExtractedItem,

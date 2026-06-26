@@ -1,11 +1,9 @@
 """Pipeline orchestrator 单元测试。"""
 
-from datetime import date, datetime
+from datetime import date
 from unittest.mock import MagicMock
 
-import pytest
 
-from app.core.pipeline_state import PipelineResult, StepResult
 from app.services.pipeline_orchestrator import PipelineOrchestrator
 
 

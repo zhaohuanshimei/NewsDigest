@@ -2,14 +2,12 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
-import pytest
 
 from app.models.article import Article
 from app.models.cluster import Cluster
 from app.models.cluster_member import ClusterMember
 from app.models.source import Source
 from app.services.cluster_service import (
-    DEFAULT_SIMILARITY_THRESHOLD,
     ClusterService,
     SCORE_ARTICLE_WEIGHT,
     SCORE_SOURCE_WEIGHT,

@@ -1,0 +1,50 @@
+version: "3.9"
+
+# =============================================================================
+# News Digest - Staging Environment
+# =============================================================================
+# 预发环境用于联调和验收，前后端独立运行。
+#
+# 使用方式:
+#   启动后端服务: docker compose -f infra/docker-compose.staging.yml up -d
+#   启动前端:     cd apps/web && npm run dev
+#   查看日志:     docker compose -f infra/docker-compose.staging.yml logs -f
+#   停止:         docker compose -f infra/docker-compose.staging.yml down
+# =============================================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: news-digest-staging-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: news
+      POSTGRES_PASSWORD: news_staging
+      POSTGRES_DB: news_digest
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_staging:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U news -d news_digest"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../services/api
+      dockerfile: ../../infra/Dockerfile.api
+    container_name: news-digest-staging-api
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://news:news_staging@db:5432/news_digest
+      LOG_LEVEL: INFO
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata_staging:

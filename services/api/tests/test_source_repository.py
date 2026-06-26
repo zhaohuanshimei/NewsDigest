@@ -1,8 +1,6 @@
-import pytest
 
-from datetime import datetime, timezone
+from datetime import datetime
 
-from app.models.source import Source
 from app.repositories.source_repository import SourceRepository
 
 

@@ -9,7 +9,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.base import Base
 # Import all models to ensure tables are created
-from app.models import Digest, DigestEntry, Cluster, ClusterMember, Article, Source, Translation
+from app.models import Digest, DigestEntry, Cluster, ClusterMember, Article, Source
 from app.routers import digests, archive, clusters, articles
 
 

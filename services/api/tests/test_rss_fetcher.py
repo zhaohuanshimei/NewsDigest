@@ -1,7 +1,5 @@
-from datetime import datetime
 from unittest.mock import MagicMock, patch
 
-import pytest
 
 from app.core.fetcher_interface import (
     BaseFetcher,
@@ -11,7 +9,6 @@ from app.core.fetcher_interface import (
     NormalizedArticle,
     make_dedupe_key,
 )
-from app.models.source import Source
 from app.repositories.article_repository import ArticleRepository
 from app.repositories.source_repository import SourceRepository
 from app.services.article_service import ArticleService

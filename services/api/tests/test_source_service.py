@@ -1,5 +1,5 @@
 from app.repositories.source_repository import SourceRepository
-from app.services.source_service import DEFAULT_SOURCES, SourceService
+from app.services.source_service import SourceService
 
 
 class TestSourceService:
