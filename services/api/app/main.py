@@ -1,6 +1,10 @@
+from contextlib import asynccontextmanager
+from os import getenv
+
 from fastapi import FastAPI
 
 from app.core.config import API_PREFIX
+from app.core.logging_config import setup_logging
 from app.core.metadata import APP_NAME, APP_VERSION
 from app.routers.archive import router as archive_router
 from app.routers.articles import router as articles_router
@@ -9,9 +13,17 @@ from app.routers.digests import router as digests_router
 from app.routers.health import router as health_router
 
 
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    """Application lifespan: configure logging on startup."""
+    setup_logging(getenv("LOG_LEVEL", "INFO"))
+    yield
+
+
 app = FastAPI(
     title=APP_NAME,
     version=APP_VERSION,
+    lifespan=lifespan,
 )
 
 app.include_router(archive_router, prefix=API_PREFIX)

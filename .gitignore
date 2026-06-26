@@ -9,5 +9,6 @@ __pycache__/
 .trae/
 standalone-skills/
 *.db
+.secrets/
 test-results/
 playwright-report/

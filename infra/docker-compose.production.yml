@@ -1,0 +1,68 @@
+version: "3.9"
+
+# =============================================================================
+# News Digest - Production Environment
+# =============================================================================
+# 使用方式:
+#   部署: docker compose -f infra/docker-compose.production.yml up -d
+#   日志: docker compose -f infra/docker-compose.production.yml logs -f -t
+#   停止: docker compose -f infra/docker-compose.production.yml down
+#   重建: docker compose -f infra/docker-compose.production.yml up -d --build
+#
+# 首次部署前需要:
+#   1. 复制 production.env.example → .env.production 并填入实际值
+#   2. 确保 PostgreSQL 数据库已创建
+#   3. 运行数据库迁移: alembic upgrade head
+# =============================================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: news-digest-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: news
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: news_digest
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U news -d news_digest"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    secrets:
+      - db_password
+
+  api:
+    build:
+      context: ../services/api
+      dockerfile: ../../infra/Dockerfile.api
+    container_name: news-digest-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8001:8001"
+    env_file:
+      - ../.env.production
+    environment:
+      # Docker Compose 内覆盖 DATABASE_URL 指向容器内的 db 服务
+      DATABASE_URL: postgresql+psycopg2://news:$$(cat /run/secrets/db_password)@db:5432/news_digest
+    depends_on:
+      db:
+        condition: service_healthy
+    secrets:
+      - db_password
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+secrets:
+  db_password:
+    file: ../.secrets/db_password.txt
+
+volumes:
+  pgdata:

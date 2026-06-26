@@ -1,207 +1,178 @@
 # 部署与上线说明
 
-本文档用于首版生产上线，默认部署形态为：
+本文档用于新闻摘要 V2 生产上线。当前部署形态为：
 
-- 后端：VPS + Docker Compose
-- 数据库：PostgreSQL
-- 前端：Cloudflare Pages
-- 发布链路：后端生产流水线生成 `exports/*.json` 与 `exports/health.json`，随后触发前端构建 webhook
+- **后端**：VPS + Docker Compose（FastAPI + PostgreSQL）
+- **前端**：Astro 静态站点（SSG），可部署到 Cloudflare Pages / Vercel / 对象存储
+- **CI/CD**：GitHub Actions 自动运行测试
 
-## 1. 上线前准备
+## 环境与配置
 
-### 1.1 Git 与代码
+### 配置管理
 
-- 确认当前提交已通过本地检查
-- 确认生产环境将拉取正确提交
-- 建议为本次上线打 tag，例如 `v0.1.0`
+所有环境变量在 `.env.example` 集中定义，包含各环境的差异说明。
+各环境使用独立的 `.env.{environment}` 文件：
 
-### 1.2 环境变量
+| 环境 | 配置文件 | 数据库 | 说明 |
+|------|---------|--------|------|
+| 开发 | `.env` | 本地 localhost:5432 | 手动 `docker compose` 或本地运行 |
+| 预发 | `.env.staging` | staging 实例 | `docker compose -f infra/docker-compose.staging.yml` |
+| 生产 | `.env.production` | 生产实例 | `docker compose -f infra/docker-compose.production.yml` |
 
-基于仓库根目录的 `.env.example` 生成生产 `.env`，至少需要配置：
+生产 `.env.production` 敏感信息通过 Docker Secrets 注入，不要直接写入文件提交到代码库。
+`.env.*` 文件已通过 `.gitignore` 排除。
 
-```env
-DATABASE_URL=postgresql+psycopg://news:strong-password@db-host:5432/news_digest
-DEEPL_API_KEY=
-GOOGLE_TRANSLATE_API_KEY=
-LOG_LEVEL=INFO
-TZ=Asia/Shanghai
-FRONTEND_BUILD_WEBHOOK_URL=https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/...
-SITE_URL=https://your-domain.example
-```
+## 后端部署
 
-说明：
-
-- `DATABASE_URL`：后端数据库连接串
-- `DEEPL_API_KEY`：主翻译服务，建议生产配置
-- `GOOGLE_TRANSLATE_API_KEY`：备选翻译服务，可选
-- `FRONTEND_BUILD_WEBHOOK_URL`：后端生产流水线完成后触发前端重新构建
-- `SITE_URL`：前端生成 RSS 时使用的正式域名
-
-## 2. 后端部署
-
-### 2.1 准备服务器
-
-建议在 VPS 上安装：
-
-- Docker
-- Docker Compose Plugin
-- Git
-
-目录示例：
+### 准备工作
 
 ```bash
-sudo mkdir -p /srv/news-digest
-sudo chown "$USER":"$USER" /srv/news-digest
+# 1. 在 VPS 上安装 Docker + Docker Compose
+# 2. 克隆代码
+git clone <your-repo-url> /srv/news-digest
 cd /srv/news-digest
-git clone <your-repo-url> .
+
+# 3. 创建生产配置
+cp .env.example .env.production
+# 编辑 .env.production 填入实际生产值
+
+# 4. 创建数据库密码 secret
+mkdir -p .secrets
+echo -n 'your-strong-password' > .secrets/db_password.txt
+
+# 5. 启动服务
+docker compose -f infra/docker-compose.production.yml up -d --build
+
+# 6. 运行数据库迁移
+docker compose -f infra/docker-compose.production.yml exec api alembic upgrade head
+
+# 7. 验证健康检查
+curl http://127.0.0.1:8001/api/v1/health
 ```
 
-### 2.2 准备配置与持久化目录
+### 一键部署
 
 ```bash
-cp .env.example .env
-mkdir -p exports
+./scripts/deploy.sh staging     # 部署预发
+./scripts/deploy.sh production   # 部署生产
 ```
 
-按实际生产值编辑 `.env`。
+### 健康检查
 
-### 2.3 启动数据库与后端
+API 提供 `/api/v1/health` 端点定期监控：
 
 ```bash
-docker compose up -d --build
+# 手动检查
+./scripts/health-check.sh
+
+# 监控远程 API
+./scripts/health-check.sh https://api.newsdigest.app
+
+# 集成到 UptimeRobot / Better Uptime 等外部监控
+# 监控 URL: https://api.newsdigest.app/api/v1/health
 ```
 
-说明：
+健康检查返回格式：
 
-- `Dockerfile` 会在容器启动时自动执行 `alembic upgrade head`
-- `docker-compose.yml` 会把本地 `./exports` 挂载到容器 `/app/exports`
-- `config/sources.yaml` 会以只读方式挂载进容器
+```json
+{
+  "status": "ok",
+  "service": "news-digest-api",
+  "version": "0.1.0",
+  "database": "ok",
+  "last_digest": {
+    "date": "2026-06-26",
+    "status": "published",
+    "published_at": "2026-06-26T09:00:00+00:00"
+  }
+}
+```
 
-### 2.4 手动执行一次生产流水线
+- `status: "error"` → 数据库连接失败
+- `database: "error"` → 数据库不可用
+- `last_digest: null` → 尚无 digest（非错误，仅新部署时）
 
-首次上线建议手动跑一次，确认抓取、翻译、导出、webhook 都正常：
+### 日志
+
+日志使用 structlog 结构化输出：
 
 ```bash
-docker compose exec app python -m news_digest.cli produce --date 2026-05-29 --target-lang zh
+# 查看 API 日志
+docker compose -f infra/docker-compose.production.yml logs -f -t api
+
+# 查看最近日志
+docker compose logs --tail=100 api
+
+# 日志驱动: json-file (max-size: 10m, max-file: 3)
+# 生产环境可切换到 external 日志聚合 (如 Loki, DataDog, etc.)
 ```
 
-执行后应确认：
+关键日志事件：
+- `pipeline_started` — 生产流水线开始
+- `pipeline_step_*_success` / `pipeline_step_*_failed` — 各步骤状态
+- `translation_provider_error` — 翻译服务异常
 
-- `exports/YYYY-MM-DD.json` 已生成
-- `exports/health.json` 已生成
-- 日志中没有持续失败的源
-- 如果配置了 `FRONTEND_BUILD_WEBHOOK_URL`，日志中出现 webhook 成功记录
+### 告警建议
 
-### 2.5 配置定时任务
+1. **健康检查失败**：使用 UptimeRobot/Better Uptime 监控 `/api/v1/health`
+2. **Pipeline 失败**：每日 cron 执行后检查日志是否有 `pipeline_step_*_failed`
+3. **数据库连接失败**：`database: "error"` 触发告警
+4. **无新鲜 digest**：如果 `last_digest.date` 超过 48 小时未更新，发出告警
+5. **磁盘空间**：日志文件 max-size 10m、max-file 3 防止日志撑满磁盘
 
-当前容器默认命令已是定时调度：
+### 回滚
 
 ```bash
-produce-schedule --config config/sources.yaml
-```
-
-如需调整执行时机，可改为显式命令，例如：
-
-```bash
-docker compose exec app python -m news_digest.cli produce-schedule --cron "0 6 * * *"
-```
-
-如果你希望容器启动后直接使用自定义 cron，建议在 `docker-compose.yml` 中覆盖 `command`。
-
-## 3. 前端部署
-
-### 3.1 Cloudflare Pages 项目配置
-
-建议将 `web/` 目录作为前端根目录：
-
-- Framework preset：`Astro`
-- Root directory：`web`
-- Build command：`npm run build`
-- Build output directory：`dist`
-- Node.js version：`20`
-
-### 3.2 前端环境变量
-
-在 Cloudflare Pages 中配置：
-
-- `SITE_URL=https://your-domain.example`
-- 可选：`DIGEST_DATE=YYYY-MM-DD`，仅用于临时指定读取某个导出日期
-- 通常不需要设置 `DIGEST_JSON_PATH`
-
-### 3.3 配置构建触发 webhook
-
-在 Cloudflare Pages 创建 Deploy Hook，并将其填入后端 `.env` 的：
-
-```env
-FRONTEND_BUILD_WEBHOOK_URL=...
-```
-
-这样后端 `produce` 流水线在导出成功后会自动触发前端重建。
-
-## 4. 首次上线验收
-
-建议按以下顺序验收：
-
-### 4.1 后端验收
-
-- 查看容器状态：
-
-```bash
-docker compose ps
-```
-
-- 查看日志：
-
-```bash
-docker compose logs app --tail=200
-```
-
-- 本机或服务器上验证健康探活：
-
-```bash
-python -m news_digest.cli serve-health --host 0.0.0.0 --port 8080
-curl http://127.0.0.1:8080/healthz
-curl http://127.0.0.1:8080/health.json
-```
-
-### 4.2 前端验收
-
-上线后重点检查：
-
-- `/`
-- `/archive`
-- `/admin/health`
-- `/digest.json`
-- `/health.json`
-- `/feed.xml`
-
-应确认：
-
-- 首页能显示最新日报
-- 归档可访问
-- 健康页能看到 `health.json` 数据
-- RSS 中链接域名为正式 `SITE_URL`
-
-## 5. 回滚建议
-
-### 5.1 后端回滚
-
-```bash
+# 后端回滚
 git checkout <previous-good-commit>
-docker compose up -d --build
+docker compose -f infra/docker-compose.production.yml up -d --build
+
+# 如果数据库 schema 已变更，确认旧版本代码兼容新 schema
 ```
 
-如果数据库 schema 已变更，回滚前需要先确认是否兼容旧版本代码。
+## 前端部署
 
-### 5.2 前端回滚
+前端为 Astro 静态站点（SSG），构建产物在 `apps/web/dist/`。
 
-在 Cloudflare Pages 控制台回滚到上一条稳定部署即可。
+### 构建
 
-## 6. 上线后建议
+```bash
+cd apps/web
+PUBLIC_DIGEST_STATE=success PUBLIC_ARCHIVE_STATE=success PUBLIC_CLUSTER_STATE=success npm run build
+```
 
-- 接入 UptimeRobot 监控：
-  - 前端：`/health.json`
-  - 后端探活：`/healthz`
-- 为 webhook 失败增加告警
-- 给正式版本打 tag 并记录发布日期
-- 在 CI 或独立环境补跑一次 Lighthouse，避免本机浏览器环境导致误报
+构建产物可直接部署到：
+- Cloudflare Pages（推荐）
+- Vercel
+- S3/对象存储 + CDN
+
+### 环境变量
+
+| 变量 | 说明 |
+|------|------|
+| `NEWS_DIGEST_API_BASE_URL` | 后端 API 地址（生产 HTTPS） |
+| `SITE_URL` | 站点域名（用于 sitemap/RSS） |
+| `PUBLIC_*_STATE` | 绝不在生产环境设置 |
+
+## 颁发验证
+
+### 后端验收
+
+```bash
+# 检查服务状态
+docker compose ps
+
+# 健康检查
+curl http://127.0.0.1:8001/api/v1/health
+
+# 查看日志
+docker compose logs --tail=50 api
+```
+
+### 前端验收
+
+- `/` — 首页能否显示最新 digest
+- `/archive` — 归档日期列表是否正常
+- `/clusters/{id}` — 详情页路由正常
+- `/rss` — RSS 订阅信息页
+- `/feed.xml` — RSS XML 输出是否包含正确域名
