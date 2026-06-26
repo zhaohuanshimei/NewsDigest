@@ -1,0 +1,578 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "News Digest API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/archive/dates": {
+      "get": {
+        "tags": [
+          "archive"
+        ],
+        "summary": "Get Archive Dates",
+        "operationId": "get_archive_date_route_api_v1_archive_dates_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArchiveDateListResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/articles/{article_id}": {
+      "get": {
+        "tags": [
+          "articles"
+        ],
+        "summary": "Get Article Detail",
+        "operationId": "get_article_detail_route_api_v1_articles__article_id__get",
+        "parameters": [
+          {
+            "name": "article_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Article Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleDetailResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/clusters/{cluster_id}": {
+      "get": {
+        "tags": [
+          "clusters"
+        ],
+        "summary": "Get Cluster Detail",
+        "operationId": "get_cluster_detail_route_api_v1_clusters__cluster_id__get",
+        "parameters": [
+          {
+            "name": "cluster_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Cluster Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClusterDetailResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/digests/latest": {
+      "get": {
+        "tags": [
+          "digests"
+        ],
+        "summary": "Get Latest Digest",
+        "operationId": "get_latest_digest_route_api_v1_digests_latest_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DigestResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/digests/{date}": {
+      "get": {
+        "tags": [
+          "digests"
+        ],
+        "summary": "Get Digest By Date",
+        "operationId": "get_digest_by_date_route_api_v1_digests__date__get",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DigestResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Get Health",
+        "operationId": "get_health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResource"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "request_id"
+        ],
+        "title": "ApiError"
+      },
+      "ApiErrorEnvelope": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ApiError"
+          }
+        },
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "title": "ApiErrorEnvelope"
+      },
+      "ArchiveDateListResource": {
+        "properties": {
+          "dates": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Dates"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dates"
+        ],
+        "title": "ArchiveDateListResource"
+      },
+      "ArticleDetailResource": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "cluster_id": {
+            "type": "string",
+            "title": "Cluster Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "published_at": {
+            "type": "string",
+            "title": "Published At"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "cluster_id",
+          "title",
+          "summary",
+          "body",
+          "source",
+          "url",
+          "published_at",
+          "language"
+        ],
+        "title": "ArticleDetailResource"
+      },
+      "ClusterDetailResource": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "headline": {
+            "type": "string",
+            "title": "Headline"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "source_count": {
+            "type": "integer",
+            "title": "Source Count"
+          },
+          "digest_dates": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Digest Dates"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "headline",
+          "summary",
+          "source_count",
+          "digest_dates"
+        ],
+        "title": "ClusterDetailResource"
+      },
+      "DigestEntryResource": {
+        "properties": {
+          "cluster_id": {
+            "type": "string",
+            "title": "Cluster Id"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "headline": {
+            "type": "string",
+            "title": "Headline"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "source_count": {
+            "type": "integer",
+            "title": "Source Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cluster_id",
+          "rank",
+          "category",
+          "headline",
+          "summary",
+          "source_count"
+        ],
+        "title": "DigestEntryResource"
+      },
+      "DigestResource": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "title": "Date"
+          },
+          "published_at": {
+            "type": "string",
+            "title": "Published At"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/DigestEntryResource"
+            },
+            "type": "array",
+            "title": "Entries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "published_at",
+          "entries"
+        ],
+        "title": "DigestResource"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResource": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "degraded",
+              "error"
+            ],
+            "title": "Status"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "database": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "error"
+            ],
+            "title": "Database"
+          },
+          "last_digest": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Digest"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "service",
+          "version",
+          "database"
+        ],
+        "title": "HealthResource"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
