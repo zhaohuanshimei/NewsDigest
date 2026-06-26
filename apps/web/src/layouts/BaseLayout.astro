@@ -4,9 +4,20 @@ import "../styles/global.css";
 interface Props {
   title: string;
   description?: string;
+  canonicalPath?: string;
+  ogImage?: string;
 }
 
-const { title, description = "Daily international digest." } = Astro.props;
+const {
+  title,
+  description = "Daily international digest.",
+  canonicalPath = "/",
+  ogImage,
+} = Astro.props;
+
+const siteUrl = "https://newsdigest.app";
+const canonicalUrl = `${siteUrl}${canonicalPath}`;
+const ogImageUrl = ogImage ?? `${siteUrl}/og-default.png`;
 ---
 
 <!doctype html>
@@ -14,8 +25,21 @@ const { title, description = "Daily international digest." } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="alternate" type="application/rss+xml" title="News Digest" href="/feed.xml" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:site_name" content="News Digest" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
   </head>
   <body>
     <slot />

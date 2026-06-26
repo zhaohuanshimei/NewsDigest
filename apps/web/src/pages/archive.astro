@@ -10,7 +10,7 @@ import { loadArchiveDates } from "../lib/content/getArchiveDates";
 const archiveState = await loadArchiveDates();
 ---
 
-<BaseLayout title={`${SITE_TITLE} Archive`} description={SITE_DESCRIPTION}>
+<BaseLayout title={`${SITE_TITLE} Archive`} description={SITE_DESCRIPTION} canonicalPath="/archive">
   <main class="page-shell">
     {
       archiveState.kind === "success" ? (

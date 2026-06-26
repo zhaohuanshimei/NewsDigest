@@ -8,9 +8,19 @@ import { loadHomepageDigest } from "../lib/content/getLatestDigest";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const homepageDigest = await loadHomepageDigest();
+
+const jsonLd = homepageDigest.kind === "success" ? {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": SITE_TITLE,
+  "description": SITE_DESCRIPTION,
+  "url": "https://newsdigest.app",
+  "datePublished": homepageDigest.digest.published_at,
+  "inLanguage": "en"
+} : null;
 ---
 
-<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} canonicalPath="/">
   <main class="page-shell">
     <section class="page-intro" aria-label="Site introduction">
       <p class="page-eyebrow">News Digest</p>
@@ -36,4 +46,8 @@ const homepageDigest = await loadHomepageDigest();
       )
     }
   </main>
+
+  {jsonLd && (
+    <div set:html={`<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`} />
+  )}
 </BaseLayout>

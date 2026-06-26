@@ -16,7 +16,7 @@ const clusterId = Astro.params.id ?? "";
 const clusterState = await loadClusterDetail(clusterId);
 ---
 
-<BaseLayout title={`${SITE_TITLE} Cluster`} description={SITE_DESCRIPTION}>
+<BaseLayout title={`${SITE_TITLE} Cluster`} description={SITE_DESCRIPTION} canonicalPath={`/clusters/${clusterId}`}>
   <main class="page-shell">
     {
       clusterState.kind === "success" ? (
