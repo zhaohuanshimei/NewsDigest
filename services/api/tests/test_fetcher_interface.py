@@ -39,6 +39,16 @@ class TestFetchRequest:
         assert req.user_agent == "test-agent"
         assert req.headers == {"Accept": "text/html"}
 
+    def test_retry_defaults(self) -> None:
+        req = FetchRequest(url="https://example.com")
+        assert req.retry_count == 0
+        assert req.retry_delay_seconds == 1.0
+
+    def test_set_retry_fields(self) -> None:
+        req = FetchRequest(url="https://example.com", retry_count=3, retry_delay_seconds=2.5)
+        assert req.retry_count == 3
+        assert req.retry_delay_seconds == 2.5
+
 
 class TestFetchResult:
 
@@ -68,20 +78,44 @@ class TestFetchResult:
             raw_content="",
             status_code=500,
             success=False,
-            error_message="Internal server error",
+            error_message="Server error",
         )
-        assert result.success is False
-        assert result.error_message == "Internal server error"
+        assert not result.success
+        assert result.error_message == "Server error"
 
     def test_success_false_with_empty_error_message(self) -> None:
         result = FetchResult(
             raw_content="",
-            status_code=500,
+            status_code=0,
             success=False,
             error_message="",
         )
-        assert result.success is False
+        assert not result.success
         assert result.error_message == ""
+
+    def test_error_code_defaults_to_none(self) -> None:
+        result = FetchResult(raw_content="", status_code=200, success=True)
+        assert result.error_code is None
+
+    def test_error_code_http_error(self) -> None:
+        result = FetchResult(
+            raw_content="",
+            status_code=404,
+            success=False,
+            error_message="Not Found",
+            error_code=FetchError.HTTP_ERROR,
+        )
+        assert result.error_code == FetchError.HTTP_ERROR
+
+    def test_error_code_network_error(self) -> None:
+        result = FetchResult(
+            raw_content="",
+            status_code=0,
+            success=False,
+            error_message="Connection refused",
+            error_code=FetchError.NETWORK_ERROR,
+        )
+        assert result.error_code == FetchError.NETWORK_ERROR
 
 
 class TestExtractedItem:

@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import Integer, String, DateTime, Text, ForeignKey, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.base import Base
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class Article(Base):
@@ -20,17 +24,17 @@ class Article(Base):
     title: Mapped[str] = mapped_column(Text, nullable=False)
     summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     body: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    published_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    language: Mapped[str] = mapped_column(String(8), default="en")
+    published_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    language: Mapped[str] = mapped_column(String(10), default="en")
     normalized_url: Mapped[Optional[str]] = mapped_column(
         Text, nullable=True, index=True
     )
     dedupe_key: Mapped[Optional[str]] = mapped_column(
         String(255), nullable=True, unique=True, index=True
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime(timezone=True), default=_utcnow, onupdate=_utcnow
     )
 
     source = relationship("Source", back_populates="articles")

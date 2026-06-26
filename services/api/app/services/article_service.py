@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
+from time import sleep
 
 from sqlalchemy.orm import Session
 
-from app.core.fetcher_interface import BaseFetcher, FetchRequest
+from app.core.fetcher_interface import BaseFetcher, FetchError, FetchRequest
 from app.models.source import Source
 from app.repositories.article_repository import ArticleRepository
 from app.repositories.source_repository import SourceRepository
-from app.services.fetchers.rss_fetcher import RssFetcher
 
 
 class ArticleService:
@@ -17,15 +17,15 @@ class ArticleService:
         self,
         article_repo: ArticleRepository,
         source_repo: SourceRepository,
-        fetcher: BaseFetcher | None = None,
+        fetcher: BaseFetcher,
     ):
         self.article_repo = article_repo
         self.source_repo = source_repo
-        self.fetcher = fetcher or RssFetcher()
+        self.fetcher = fetcher
 
     def fetch_and_persist(self, source: Source) -> tuple[int, int]:
-        request = FetchRequest(url=source.url)
-        result = self.fetcher.fetch(request)
+        request = FetchRequest(url=source.url, retry_count=2, retry_delay_seconds=1.0)
+        result = self._fetch_with_retry(request)
         if not result.success:
             return (0, 0)
 
@@ -57,9 +57,17 @@ class ArticleService:
             )
             new_count += 1
 
-        source.last_fetched_at = datetime.utcnow()
-        self.source_repo.db.commit()
+        self.source_repo.update_last_fetched_at(source.id)
         return (new_count, dup_count)
+
+    def _fetch_with_retry(self, request: FetchRequest) -> FetchResult:
+        for attempt in range(request.retry_count + 1):
+            result = self.fetcher.fetch(request)
+            if result.success:
+                return result
+            if attempt < request.retry_count:
+                sleep(request.retry_delay_seconds)
+        return result
 
     def fetch_all_active_sources(
         self, db: Session

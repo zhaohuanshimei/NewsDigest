@@ -1,14 +1,15 @@
-import os
-
-os.environ["DATABASE_URL"] = "sqlite://"
-
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.base import Base
-from app.models.source import Source
-from app.models.article import Article
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _patch_env():
+    import os
+    os.environ["DATABASE_URL"] = "sqlite://"
+    yield
 
 
 @pytest.fixture

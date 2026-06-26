@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import Boolean, Integer, String, DateTime, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.base import Base
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class Source(Base):
@@ -16,13 +20,13 @@ class Source(Base):
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     kind: Mapped[str] = mapped_column(String(16), nullable=False)
     url: Mapped[str] = mapped_column(Text, nullable=False)
-    language: Mapped[str] = mapped_column(String(8), default="en")
+    language: Mapped[str] = mapped_column(String(10), default="en")
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     fetch_interval_minutes: Mapped[int] = mapped_column(Integer, default=30)
-    last_fetched_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    last_fetched_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime(timezone=True), default=_utcnow, onupdate=_utcnow
     )
 
     articles = relationship("Article", back_populates="source")

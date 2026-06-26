@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from sqlalchemy.orm import Session
 
 from app.models.source import Source
@@ -46,6 +48,15 @@ class SourceRepository:
             return None
         for key, value in kwargs.items():
             setattr(source, key, value)
+        self.db.commit()
+        self.db.refresh(source)
+        return source
+
+    def update_last_fetched_at(self, source_id: int) -> Source | None:
+        source = self.get_by_id(source_id)
+        if source is None:
+            return None
+        source.last_fetched_at = datetime.now(timezone.utc)
         self.db.commit()
         self.db.refresh(source)
         return source

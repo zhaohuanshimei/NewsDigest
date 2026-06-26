@@ -1,5 +1,7 @@
 import pytest
 
+from datetime import datetime, timezone
+
 from app.models.source import Source
 from app.repositories.source_repository import SourceRepository
 
@@ -77,6 +79,15 @@ class TestSourceRepository:
     def test_update_not_found(self, db_session):
         repo = SourceRepository(db_session)
         assert repo.update(999, name="Nope") is None
+
+    def test_update_last_fetched_at(self, db_session):
+        repo = SourceRepository(db_session)
+        source = repo.create(name="Fetcher", kind="rss", url="https://example.com/rss")
+        assert source.last_fetched_at is None
+        updated = repo.update_last_fetched_at(source.id)
+        assert updated is not None
+        assert updated.last_fetched_at is not None
+        assert isinstance(updated.last_fetched_at, datetime)
 
     def test_delete_source(self, db_session):
         repo = SourceRepository(db_session)

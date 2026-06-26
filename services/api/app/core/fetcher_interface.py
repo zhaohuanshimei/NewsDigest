@@ -25,6 +25,8 @@ class FetchRequest:
     timeout_seconds: int = 30
     user_agent: str | None = None
     headers: dict[str, str] | None = None
+    retry_count: int = 0
+    retry_delay_seconds: float = 1.0
 
 
 @dataclass
@@ -35,6 +37,7 @@ class FetchResult:
     content_type: str | None = None
     fetched_at: datetime = field(default_factory=datetime.now)
     error_message: str | None = None
+    error_code: FetchError | None = None
 
 
 @dataclass

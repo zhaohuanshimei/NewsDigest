@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import Integer, String, DateTime, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.base import Base
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class Translation(Base):
@@ -19,15 +23,15 @@ class Translation(Base):
     digest_entry_id: Mapped[Optional[int]] = mapped_column(
         Integer, ForeignKey("digest_entries.id"), nullable=True
     )
-    target_language: Mapped[str] = mapped_column(String(8), nullable=False)
+    target_language: Mapped[str] = mapped_column(String(10), nullable=False)
     translated_title: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     translated_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     provider: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     status: Mapped[str] = mapped_column(String(16), default="pending")
     review_state: Mapped[str] = mapped_column(String(16), default="unreviewed")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime(timezone=True), default=_utcnow, onupdate=_utcnow
     )
 
     article = relationship("Article", back_populates="translations")

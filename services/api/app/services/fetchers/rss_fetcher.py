@@ -10,6 +10,7 @@ import feedparser
 from app.core.fetcher_interface import (
     BaseFetcher,
     ExtractedItem,
+    FetchError,
     FetchRequest,
     FetchResult,
     NormalizedArticle,
@@ -46,13 +47,16 @@ class RssFetcher(BaseFetcher):
                 status_code=e.code,
                 success=False,
                 error_message=f"HTTP {e.code}: {e.reason}",
+                error_code=FetchError.HTTP_ERROR,
             )
         except urllib.error.URLError as e:
+            code = FetchError.TIMEOUT if isinstance(e.reason, str) and "timed out" in e.reason else FetchError.NETWORK_ERROR
             return FetchResult(
                 raw_content="",
                 status_code=0,
                 success=False,
                 error_message=f"URL error: {e.reason}",
+                error_code=code,
             )
         except Exception as e:
             return FetchResult(
@@ -60,6 +64,7 @@ class RssFetcher(BaseFetcher):
                 status_code=0,
                 success=False,
                 error_message=str(e),
+                error_code=FetchError.UNKNOWN,
             )
 
     def extract(self, result: FetchResult) -> list[ExtractedItem]:
