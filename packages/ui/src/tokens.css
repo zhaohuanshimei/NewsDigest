@@ -1,0 +1,192 @@
+/**
+ * News Digest V2 — Design Tokens as CSS Custom Properties
+ *
+ * Derived from packages/ui/src/tokens/ (TypeScript token definitions).
+ * Import in your Astro layout: import "@news-digest/ui/tokens.css"
+ *
+ * Design direction: C ("极简升级版") with Direction A newspaper influence.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ── Text colors ──────────────────────────────────────────── */
+  --color-text-primary: #000000;
+  --color-text-secondary: #404040;
+  --color-text-muted: #5C5C5C;
+  --color-text-disabled: #B0B0B0;
+  --color-text-inverse: #FFFFFF;
+
+  /* ── Background colors ────────────────────────────────────── */
+  --color-bg-page: #FFFFFF;
+  --color-bg-card: #FFFFFF;
+  --color-bg-hover: #F5F5F5;
+  --color-bg-active: #E8F0F8;
+  --color-bg-muted: #FAFAFA;
+
+  /* ── Border colors ────────────────────────────────────────── */
+  --color-border: #D4D4D4;
+  --color-border-light: #EBEBEB;
+  --color-border-focus: #2E6EA6;
+
+  /* ── Interactive colors ───────────────────────────────────── */
+  --color-link: #2E6EA6;
+  --color-link-hover: #1A3A5C;
+  --color-button-primary-bg: #245680;
+  --color-button-primary-text: #FFFFFF;
+  --color-button-primary-hover: #1A3A5C;
+
+  /* ── Status colors ────────────────────────────────────────── */
+  --color-success: #2D6A4F;
+  --color-error: #B91C1C;
+  --color-warning: #92400E;
+
+  /* ── Page chrome (warm off-white, matches existing site) ── */
+  --page-background: #f8f6f1;
+  --surface-background: #fbfaf7;
+  --surface-border: rgba(31, 35, 40, 0.12);
+  --muted-text: #59636e;
+  --headline-text: #11151a;
+
+  /* ── Spacing scale (4px grid) ────────────────────────────── */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* ── Typography — font families ───────────────────────────── */
+  --font-serif: Georgia, "Playfair Display", "Times New Roman", Times, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", Menlo,
+    Consolas, monospace;
+
+  /* ── Typography — sizes ───────────────────────────────────── */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 20px;
+  --text-3xl: 24px;
+  --text-4xl: 32px;
+  --text-5xl: 40px;
+
+  /* ── Typography — line heights ────────────────────────────── */
+  --leading-tight: 1.2;
+  --leading-snug: 1.4;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.8;
+
+  /* ── Typography — weights ─────────────────────────────────── */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* ── Typography — letter spacing ──────────────────────────── */
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.02em;
+  --tracking-wider: 0.06em;
+
+  /* ── Layout ───────────────────────────────────────────────── */
+  --content-max-width: 680px;
+  --page-max-width: 1200px;
+  --touch-target-min: 44px;
+  --radius-card: 4px;
+  --radius-button: 2px;
+
+  /* ── Transitions ──────────────────────────────────────────── */
+  --transition-fast: 150ms ease;
+}
+
+/* ── Base reset ────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ── Typography preset utility classes ────────────────────────── */
+/* These can be used by any component or page for consistent type styling. */
+
+.typo-hero {
+  font-family: var(--font-serif);
+  font-size: var(--text-5xl);
+  line-height: var(--leading-tight);
+  font-weight: var(--font-bold);
+  letter-spacing: var(--tracking-tight);
+}
+
+.typo-page-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  font-weight: var(--font-bold);
+  letter-spacing: var(--tracking-tight);
+}
+
+.typo-card-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-3xl);
+  line-height: var(--leading-snug);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-normal);
+}
+
+.typo-section-heading {
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-snug);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-normal);
+}
+
+.typo-body {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  line-height: var(--leading-normal);
+  font-weight: var(--font-normal);
+  letter-spacing: var(--tracking-normal);
+}
+
+.typo-lead {
+  font-family: var(--font-sans);
+  font-size: var(--text-xl);
+  line-height: var(--leading-relaxed);
+  font-weight: var(--font-normal);
+  letter-spacing: var(--tracking-normal);
+}
+
+.typo-caption {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  font-weight: var(--font-normal);
+  letter-spacing: var(--tracking-normal);
+}
+
+.typo-meta {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  font-weight: var(--font-normal);
+  letter-spacing: var(--tracking-wide);
+}
+
+.typo-tag {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  font-weight: var(--font-medium);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}

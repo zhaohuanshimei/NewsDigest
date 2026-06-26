@@ -1,0 +1,131 @@
+---
+/**
+ * Button — primary interactive element.
+ *
+ * Variants:
+ *   primary — accent background, inverse text
+ *   secondary — transparent bg, bordered
+ *   ghost — no border, subtle hover
+ *
+ * Sizes: sm, md (default)
+ *
+ * Can render as <a> by passing `href`.
+ */
+
+interface Props {
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "sm" | "md";
+  href?: string;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  variant = "primary",
+  size = "md",
+  href,
+  disabled = false,
+  type = "button",
+  class: className,
+  ...attrs
+} = Astro.props;
+
+const Tag = href ? "a" : "button";
+---
+
+<Tag
+  class:list={["btn", `btn--${variant}`, `btn--${size}`, className]}
+  href={href}
+  disabled={Tag === "button" ? disabled : undefined}
+  type={Tag === "button" ? type : undefined}
+  aria-disabled={disabled || undefined}
+  {...attrs}
+>
+  <slot />
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: var(--radius-button, 2px);
+    font-family: var(--font-sans, sans-serif);
+    font-weight: var(--font-medium, 500);
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    background: transparent;
+    transition:
+      background var(--transition-fast, 150ms ease),
+      color var(--transition-fast, 150ms ease),
+      border-color var(--transition-fast, 150ms ease);
+    line-height: 1;
+  }
+
+  /* ── Sizes ──────────────────────────────────────────────── */
+
+  .btn--sm {
+    padding: var(--space-2, 8px) var(--space-3, 12px);
+    font-size: var(--text-xs, 12px);
+    min-height: var(--touch-target-min, 44px);
+  }
+
+  .btn--md {
+    padding: var(--space-3, 12px) var(--space-6, 24px);
+    font-size: var(--text-base, 14px);
+    min-height: var(--touch-target-min, 44px);
+  }
+
+  /* ── Variants ───────────────────────────────────────────── */
+
+  .btn--primary {
+    background: var(--color-button-primary-bg, #245680);
+    color: var(--color-button-primary-text, #fff);
+    border-color: var(--color-button-primary-bg, #245680);
+  }
+
+  .btn--primary:hover {
+    background: var(--color-button-primary-hover, #1a3a5c);
+    border-color: var(--color-button-primary-hover, #1a3a5c);
+  }
+
+  .btn--secondary {
+    background: transparent;
+    color: var(--color-text-primary, #000);
+    border-color: var(--color-border, #d4d4d4);
+  }
+
+  .btn--secondary:hover {
+    background: var(--color-bg-hover, #f5f5f5);
+    border-color: var(--color-text-primary, #000);
+  }
+
+  .btn--ghost {
+    background: transparent;
+    color: var(--color-link, #2e6ea6);
+    border-color: transparent;
+  }
+
+  .btn--ghost:hover {
+    background: var(--color-bg-hover, #f5f5f5);
+    color: var(--color-link-hover, #1a3a5c);
+  }
+
+  /* ── Disabled ───────────────────────────────────────────── */
+
+  .btn[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .btn[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+</style>

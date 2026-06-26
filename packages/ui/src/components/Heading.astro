@@ -1,0 +1,94 @@
+---
+/**
+ * Heading — semantic heading with design-system typography.
+ *
+ * Props:
+ *   level  — 1..6, determines the HTML tag (h1-h6)
+ *   preset — optional typography preset class override
+ *            (hero, page-title, card-title, section-heading)
+ *
+ * If no preset is given the heading uses serif font and a
+ * level-based default size.
+ */
+
+type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
+interface Props {
+  level: HeadingLevel;
+  preset?: "hero" | "page-title" | "card-title" | "section-heading";
+  class?: string;
+  [key: string]: any;
+}
+
+const {
+  level,
+  preset,
+  class: className,
+  ...attrs
+} = Astro.props;
+
+const Tag = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+---
+
+<Tag
+  class:list={[
+    "heading",
+    preset ? `typo-${preset}` : `heading--level-${level}`,
+    className,
+  ]}
+  {...attrs}
+>
+  <slot />
+</Tag>
+
+<style>
+  .heading {
+    margin: 0;
+    font-family: var(--font-serif, Georgia, serif);
+    color: var(--color-text-primary, #000);
+  }
+
+  /* ── Level-based sizes (used when no preset) ────────────── */
+
+  .heading--level-1 {
+    font-size: var(--text-4xl, 32px);
+    line-height: var(--leading-tight, 1.2);
+    font-weight: var(--font-bold, 700);
+    letter-spacing: var(--tracking-tight, -0.02em);
+  }
+
+  .heading--level-2 {
+    font-size: var(--text-3xl, 24px);
+    line-height: var(--leading-snug, 1.4);
+    font-weight: var(--font-semibold, 600);
+    letter-spacing: var(--tracking-normal, 0em);
+  }
+
+  .heading--level-3 {
+    font-size: var(--text-2xl, 20px);
+    line-height: var(--leading-snug, 1.4);
+    font-weight: var(--font-semibold, 600);
+    letter-spacing: var(--tracking-normal, 0em);
+  }
+
+  .heading--level-4 {
+    font-size: var(--text-xl, 18px);
+    line-height: var(--leading-snug, 1.4);
+    font-weight: var(--font-semibold, 600);
+    letter-spacing: var(--tracking-normal, 0em);
+  }
+
+  .heading--level-5 {
+    font-size: var(--text-lg, 16px);
+    line-height: var(--leading-normal, 1.6);
+    font-weight: var(--font-semibold, 600);
+    letter-spacing: var(--tracking-normal, 0em);
+  }
+
+  .heading--level-6 {
+    font-size: var(--text-base, 14px);
+    line-height: var(--leading-normal, 1.6);
+    font-weight: var(--font-semibold, 600);
+    letter-spacing: var(--tracking-wide, 0.02em);
+  }
+</style>
