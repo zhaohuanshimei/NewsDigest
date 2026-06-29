@@ -43,7 +43,7 @@ if [ "$WEB_ONLY" = false ]; then
 
     echo ">>> 等待 API 健康..."
     for i in $(seq 1 30); do
-        if docker exec news-digest-v2-api curl -s http://127.0.0.1:8001/api/v1/health > /dev/null 2>&1; then
+        if curl -s http://127.0.0.1:8001/api/v1/health > /dev/null 2>&1; then
             echo "API 健康!"
             break
         fi
