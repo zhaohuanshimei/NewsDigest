@@ -208,8 +208,6 @@ class PipelineTranslatorAdapter:
         for the date, returns 0 (not an error — the pipeline may run before
         a digest is generated).
         """
-        from datetime import date as _date
-
         digest = self._digest_repo.get_by_date(target_date)
         if digest is None:
             logger.info("translate_skipped_no_digest", target_date=target_date.isoformat())
