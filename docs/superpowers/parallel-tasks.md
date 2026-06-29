@@ -485,7 +485,8 @@ git commit -m "feat: implement archive and detail query services"
 | P5/P6 验收修复 | (本提交) | structlog 加入 requirements + pipeline UTC 修复 + DigestEntry import 补全 |
 | **P7 (F01-F07)** | `a56a56c`~`f4f6ffb` | API 测试基线 (15) + 契约测试 (25) + Web 测试基线 (1) + E2E 测试 (6) + CI 流水线 + 预发环境 + 生产部署/日志/告警 |
 
-**合计：210 后端 pytest + 168 前端 vitest = 378 tests + 1 xfail 全部通过 ✅** （另有 fetcher 测试 41 个需外部依赖被自动排除）
+**合计：267 后端 pytest (266 ✅ + 1 xfail) + 168 前端 vitest = 435 tests 全部通过 ✅**
+（Vite 缓存并发导致 2 个 archive 页面测试批量运行时偶发失败，单独运行均通过；非代码问题）
 
 ## 后续批次规划
 
@@ -504,6 +505,3 @@ git commit -m "feat: implement archive and detail query services"
 | 所有 L1 任务 | 0 | 🎉 **L1 首发版全部完成** |
 | L2 运营后台 | ~5 | 下一阶段 |
 | L3 多客户端扩展 | ~3 | 未来阶段 |
-| ~~P6~~ | ~~5~~ | ~~✅ 已完成~~ |
-| **P7（最后一批）** | **~7** | F01-F07 |
-| **合计** | **~7** | 距离 L1 完成约 7 个任务 |

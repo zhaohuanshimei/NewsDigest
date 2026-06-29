@@ -40,7 +40,7 @@ docker compose -f "$COMPOSE_FILE" up -d --build
 # Step 3: Wait for health check
 echo ">>> Waiting for API health check..."
 for i in $(seq 1 30); do
-    if curl -s http://127.0.0.1:8001/health > /dev/null 2>&1; then
+    if curl -s http://127.0.0.1:8001/api/v1/health > /dev/null 2>&1; then
         echo "API is healthy!"
         break
     fi
@@ -58,6 +58,7 @@ docker compose -f "$COMPOSE_FILE" exec -T api alembic upgrade head
 
 echo "=== Deployment to $ENV complete ==="
 echo "API: http://127.0.0.1:8001"
+echo "Docs: http://127.0.0.1:8001/docs"
 echo "Health: http://127.0.0.1:8001/api/v1/health"
 echo ""
 echo "Run 'docker compose -f $COMPOSE_FILE logs -f -t' to tail logs."
