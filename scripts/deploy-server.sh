@@ -15,6 +15,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$PROJECT_DIR/infra/docker-compose.server.yml"
+ENV_FILE="$PROJECT_DIR/.env"
 cd "$PROJECT_DIR"
 
 API_ONLY=false
@@ -40,7 +41,7 @@ git pull --ff-only
 if [ "$WEB_ONLY" = false ]; then
     echo ""
     echo ">>> 构建 + 启动 API..."
-    docker compose -f "$COMPOSE_FILE" up -d --build api
+    docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --build api
 
     echo ">>> 等待 API 健康..."
     for i in $(seq 1 30); do
@@ -64,13 +65,13 @@ fi
 if [ "$API_ONLY" = false ]; then
     echo ""
     echo ">>> 构建 + 启动前端 (SSG 从 API 拉数据)..."
-    docker compose -f "$COMPOSE_FILE" up -d --build web
+    docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --build web
 fi
 
 # Step 4: 状态检查
 echo ""
 echo ">>> 容器状态:"
-docker compose -f "$COMPOSE_FILE" ps
+docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" ps
 
 echo ""
 echo "=== 部署完成 ==="
