@@ -1,0 +1,53 @@
+# =============================================================================
+# News Digest V2 — maczhao.com 服务器部署
+# =============================================================================
+# 适配服务器架构：
+#   - 共享 PostgreSQL (shared-postgres 容器, maczhao-net 网络)
+#   - Caddy 反向代理 (自动 HTTPS)
+#   - 不自建数据库容器，使用 shared-postgres 中的 news_digest_v2 库
+#
+# 使用方式 (在服务器上):
+#   cd /www/projects/news-digest-v2
+#   docker compose -f infra/docker-compose.server.yml up -d --build
+#
+# 前端构建时需要 API 已运行（SSG 构建时拉数据），
+# 用 deploy-server.sh 脚本处理构建顺序。
+# =============================================================================
+
+services:
+  api:
+    build:
+      context: ../services/api
+      dockerfile: ../../infra/Dockerfile.api
+    container_name: news-digest-v2-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8001:8001"
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://news_v2:newsdigestv2@shared-postgres:5432/news_digest_v2
+      - TZ=Asia/Shanghai
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - TRANSLATION_API_BASE_URL=${TRANSLATION_API_BASE_URL:-}
+      - TRANSLATION_API_KEY=${TRANSLATION_API_KEY:-}
+      - TRANSLATION_MODEL=${TRANSLATION_MODEL:-gpt-4o-mini}
+    networks:
+      - maczhao-net
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.web
+      args:
+        NEWS_DIGEST_API_BASE_URL: http://news-digest-v2-api:8001/api/v1
+        PUBLIC_DIGEST_STATE: ${PUBLIC_DIGEST_STATE:-}
+        SITE_URL: ${SITE_URL:-https://news-v2.maczhao.com}
+    container_name: news-digest-v2-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    networks:
+      - maczhao-net
+
+networks:
+  maczhao-net:
+    external: true
