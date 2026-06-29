@@ -1,0 +1,24 @@
+# Caddyfile — news.maczhao.com 配置
+#
+# 添加到服务器 /www/caddy/Caddyfile，然后 docker restart caddy
+# Caddy 自动申请 Let's Encrypt HTTPS 证书
+
+sudoku.maczhao.com {
+    reverse_proxy sudoku-trainer:3010
+}
+
+www.maczhao.com {
+    reverse_proxy homepage-web:3000
+}
+
+news.maczhao.com {
+    # API 请求转给后端
+    handle /api/* {
+        reverse_proxy news-digest-v2-api:8001
+    }
+
+    # 其他请求转给前端 nginx
+    handle {
+        reverse_proxy news-digest-v2-web:80
+    }
+}
