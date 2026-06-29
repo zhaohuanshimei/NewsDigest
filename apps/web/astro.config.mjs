@@ -2,7 +2,7 @@ import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
-  site: "https://newsdigest.app",
+  site: "https://news.maczhao.com",
   integrations: [sitemap()],
   server: {
     host: true,
