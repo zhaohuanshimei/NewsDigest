@@ -9,6 +9,7 @@ skipped, and provider failures are isolated per entry.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from datetime import date
 
 import structlog
 from sqlalchemy.orm import Session
@@ -178,3 +179,41 @@ class TranslationService:
             provider=provider_name,
         )
         return True
+
+
+# ---------------------------------------------------------------------------
+# Pipeline adapter
+# ---------------------------------------------------------------------------
+
+
+class PipelineTranslatorAdapter:
+    """Adapts :class:`TranslationService` to the pipeline's translator protocol.
+
+    The pipeline calls ``translate_digest_entries(target_date=date)`` but
+    :class:`TranslationService` expects a ``digest_id``. This adapter looks
+    up the digest for the given date and delegates to the real service.
+    """
+
+    def __init__(self, session: Session, provider: TranslationProvider | None = None) -> None:
+        from app.repositories.digest_repository import DigestRepository
+
+        self.session = session
+        self.provider = provider
+        self._digest_repo = DigestRepository(session)
+
+    def translate_digest_entries(self, target_date: date) -> int:
+        """Translate entries of the digest for *target_date*.
+
+        Returns the count of newly translated entries. If no digest exists
+        for the date, returns 0 (not an error — the pipeline may run before
+        a digest is generated).
+        """
+        from datetime import date as _date
+
+        digest = self._digest_repo.get_by_date(target_date)
+        if digest is None:
+            logger.info("translate_skipped_no_digest", target_date=target_date.isoformat())
+            return 0
+
+        service = TranslationService(self.session, provider=self.provider)
+        return service.translate_digest_entries(digest_id=digest.id)
