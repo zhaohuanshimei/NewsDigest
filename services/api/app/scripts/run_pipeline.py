@@ -19,7 +19,6 @@ import structlog
 from app.database import SessionLocal
 from app.repositories.article_repository import ArticleRepository
 from app.repositories.source_repository import SourceRepository
-from app.services.article_normalizer import ArticleNormalizer
 from app.services.article_service import ArticleService
 from app.services.cluster_service import ClusterService
 from app.services.digest_generator import DigestGenerator
@@ -84,11 +83,10 @@ def main() -> int:
               + (f" error={error}" if error else ""))
 
         # Step 2: Normalize pending articles
-        normalizer = ArticleNormalizer(session)
         # ArticleNormalizer doesn't have normalize_pending_articles — it works
         # per-article during fetch_and_persist. So we skip this step.
         # The fetcher's normalize() is called inside ArticleService.fetch_and_persist.
-        print(f"  [SKIP] normalize      (handled during fetch)")
+        print("  [SKIP] normalize      (handled during fetch)")
 
         # Step 3: Cluster articles from yesterday and today
         since = datetime.combine(target_date - timedelta(days=1), datetime.min.time())
@@ -113,9 +111,9 @@ def main() -> int:
                 print(f"  [{status}] {name:12s} entries={count}"
                       + (f" error={error}" if error else ""))
             else:
-                print(f"  [SKIP] translate      (no TRANSLATION_* env vars)")
+                print("  [SKIP] translate      (no TRANSLATION_* env vars)")
         else:
-            print(f"\n  [SKIP] translate      (--no-translate)")
+            print("\n  [SKIP] translate      (--no-translate)")
 
     print("\n" + "=" * 50)
     print("Pipeline complete.")
