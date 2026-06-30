@@ -1,0 +1,105 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_TITLE } from "../lib/config/site";
+
+const pageTitle = "About";
+---
+
+<BaseLayout title={`${pageTitle} | ${SITE_TITLE}`} canonicalPath="/about">
+  <main class="page-shell">
+    <section class="page-intro" aria-label="About this site">
+      <p class="page-eyebrow">{pageTitle}</p>
+      <h1 class="page-title">A calm daily briefing on the latest global stories.</h1>
+      <p class="page-description">
+        News Digest collects, clusters, and summarizes international news from multiple sources
+        into a single daily briefing. Each digest clusters related articles, picks the most
+        representative headline, and translates content into Chinese — so you can stay informed
+        in one pass.
+      </p>
+    </section>
+
+    <section class="about-section">
+      <h2 class="about-heading">How it works</h2>
+      <ol class="about-list">
+        <li class="about-list-item">
+          <strong>Collect</strong> — RSS feeds from international news sources are fetched
+          throughout the day.
+        </li>
+        <li class="about-list-item">
+          <strong>Cluster</strong> — Articles covering the same story are grouped together
+          by content similarity.
+        </li>
+        <li class="about-list-item">
+          <strong>Summarize</strong> — The best headline and summary for each cluster is
+          selected automatically.
+        </li>
+        <li class="about-list-item">
+          <strong>Translate</strong> — Content is translated into Chinese using an
+          OpenAI-compatible translation service.
+        </li>
+        <li class="about-list-item">
+          <strong>Publish</strong> — A daily digest is assembled and published on this site.
+        </li>
+      </ol>
+    </section>
+
+    <section class="about-section">
+      <h2 class="about-heading">Technology</h2>
+      <p class="about-description">
+        Built with FastAPI, SQLAlchemy, and PostgreSQL on the backend, and Astro on the
+        frontend. Shared type contracts live in a shared-types package to keep API and
+        frontend in sync. Deployed via Docker on a Linux server behind Caddy.
+      </p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .about-section {
+    margin-top: 3rem;
+  }
+
+  .about-heading {
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    margin-bottom: 1rem;
+  }
+
+  .about-description {
+    max-width: 38rem;
+    font-size: 0.98rem;
+    line-height: 1.75;
+    color: var(--muted-text);
+  }
+
+  .about-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .about-list-item {
+    font-size: 0.98rem;
+    line-height: 1.75;
+    color: var(--muted-text);
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  .about-list-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--surface-border);
+  }
+
+  .about-list-item strong {
+    color: var(--headline-text);
+  }
+</style>
