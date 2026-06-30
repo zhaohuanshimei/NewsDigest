@@ -13,7 +13,251 @@
 
 ## 当前任务批次
 
-**无待执行任务。** P6 批次已全部完成，P7 批次待后续执行。
+**P8 批次：新闻 pipeline 质量地基（P1-P3，零 AI 成本）。** 上游愿景见 `docs/architecture/news-pipeline-vision.md`，Hermes 集成（P6）见 `docs/architecture/hermes-integration.md`。
+
+**前置说明：** P1-P3 互相有依赖，不能完全并行。执行顺序：P1-A/P1-B 可并行 → P2 依赖 P1-B → P3 依赖 P1+P2。
+
+### Task P1-A: 多层去重服务
+
+- **Status:** pending
+- **Owner:** —
+
+#### 任务
+实现 `DedupService`，在现有 URL 精确匹配之上增加标题相似度层和内容相似度层，形成漏斗式去重。同事件跨源转载只保留 quality_score 最高的源的代表文章。
+
+#### 上下文文件（先读）
+- services/api/app/services/article_normalizer.py — 现有 URL dedup 逻辑
+- services/api/app/repositories/article_repository.py — article 持久化
+- services/api/app/models/article.py — Article 模型
+- docs/architecture/news-pipeline-vision.md — pipeline 演进方向
+- docs/architecture/domain-model.md — Article 定义
+
+#### 可以创建/修改的文件
+- services/api/app/services/dedup_service.py — 新建
+- services/api/tests/test_dedup_service.py — 新建
+- services/api/app/services/article_normalizer.py — 修改（接入 DedupService）
+
+#### 禁碰文件
+- 除上面 3 个文件外的一切文件
+
+#### 实现要求
+1. `DedupService` 接收 Session 作为依赖
+2. 三层漏斗：
+   - Layer 1: URL 精确匹配（复用现有逻辑）
+   - Layer 2: 标题归一化（lowercase + 去标点 + 去媒体名）后 Jaccard 相似度 > 0.85
+   - Layer 3: 内容 TF-IDF cosine 相似度 > 0.88（只对 Layer 2 未命中的跑）
+3. `deduplicate(articles: list[Article]) -> list[Article]`：
+   - 输入待去重文章列表
+   - 输出去重后列表，同事件只保留一篇
+   - 保留规则：优先 quality_score 高的源；同分取更新时间最新的
+4. 标题归一化工具函数：去媒体名（BBC/CNN/NYT 等常见前缀）、去标点、lowercase、trim
+5. 性能：Layer 3 只对 Layer 2 未命中的文章对跑，不全量算 cosine
+6. 单元测试覆盖：URL 命中、标题命中、内容命中、三层都未命中、保留规则、空列表、单元素
+
+#### 验收检查
+```bash
+cd services/api && python -m pytest tests/test_dedup_service.py -v
+cd services/api && python -m pytest -v  # 全量回归
+```
+
+#### 完成后 commit
+```bash
+git add services/api/app/services/dedup_service.py services/api/tests/test_dedup_service.py services/api/app/services/article_normalizer.py
+git commit -m "feat: implement multi-layer dedup service (URL + title + content similarity)"
+```
+
+---
+
+### Task P1-B: Topic 分类服务（规则版）
+
+- **Status:** pending
+- **Owner:** —
+
+#### 任务
+实现 `TopicClassifier`，基于关键词规则对文章做 topic 分类。零 AI 成本、可解释、效果够用。后续可被 LLM 分类替换，但接口保持稳定。
+
+#### 上下文文件（先读）
+- services/api/app/models/article.py — Article 模型（将加 topic 字段）
+- services/api/app/models/cluster.py — Cluster 模型（将加 topic 字段）
+- services/api/alembic/ — 现有迁移参考
+- docs/architecture/news-pipeline-vision.md — topic 分区 digest 目标
+- docs/architecture/domain-model.md — Article/Cluster 定义
+
+#### 可以创建/修改的文件
+- services/api/app/services/topic_classifier.py — 新建
+- services/api/app/core/topic_rules.py — 新建（关键词规则表）
+- services/api/tests/test_topic_classifier.py — 新建
+- services/api/app/models/article.py — 修改（加 topic 字段）
+- services/api/app/models/cluster.py — 修改（加 topic 字段）
+- services/api/alembic/versions/<new>_add_topic_fields.py — 新建迁移
+
+#### 禁碰文件
+- 除上面 6 个文件外的一切文件
+
+#### 实现要求
+1. `TopicClassifier` 不需要 Session（纯函数式，无状态）
+2. `classify(article: Article) -> str`：返回 topic label
+3. Topic 列表：`politics / business / tech / science / world / health / general`
+4. 关键词规则在 `app/core/topic_rules.py`：
+   - 每个 topic 一组关键词（politics: congress/senate/parliament/election/bill/lawmaker...）
+   - 文章标题+摘要关键词命中率最高的 topic 胜出
+   - 命中率 < 阈值（如 0.05）则归 `general`
+5. Article 和 Cluster 模型加 `topic: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)`
+6. Alembic 迁移加字段
+7. 单元测试覆盖：每个 topic 至少 2 个正例、general 兜底、空文本、跨 topic 关键词冲突
+
+#### 验收检查
+```bash
+cd services/api && python -m pytest tests/test_topic_classifier.py -v
+cd services/api && python -m pytest -v  # 全量回归
+cd services/api && alembic upgrade head  # 迁移可跑
+```
+
+#### 完成后 commit
+```bash
+git add services/api/app/services/topic_classifier.py services/api/app/core/topic_rules.py services/api/tests/test_topic_classifier.py services/api/app/models/article.py services/api/app/models/cluster.py services/api/alembic/versions/
+git commit -m "feat: implement rule-based topic classifier with article/cluster topic fields"
+```
+
+---
+
+### Task P2: 源 quality_score 学习机制
+
+- **Status:** pending
+- **Owner:** —
+- **依赖:** P1-B 完成（topic 字段需要先存在，用于统计进 digest 比例）
+
+#### 任务
+给 Source 模型加 `quality_score` 和 `tier` 字段，实现 `SourceScoringService` 周期性调分。不用 AI，纯统计学习。
+
+#### 上下文文件（先读）
+- services/api/app/models/source.py — Source 模型
+- services/api/app/services/source_service.py — 现有源服务
+- services/api/app/repositories/source_repository.py — 源 repo
+- services/api/app/models/article.py — Article（统计进 digest 比例用）
+- services/api/app/models/cluster.py — Cluster（统计聚类用）
+- docs/architecture/news-pipeline-vision.md — quality_score 学习机制
+- docs/architecture/domain-model.md — Source 定义
+
+#### 可以创建/修改的文件
+- services/api/app/services/source_scoring_service.py — 新建
+- services/api/tests/test_source_scoring_service.py — 新建
+- services/api/app/models/source.py — 修改（加字段）
+- services/api/alembic/versions/<new>_add_source_quality_fields.py — 新建迁移
+- services/api/app/services/source_service.py — 修改（DEFAULT_SOURCES 填初始 quality_score 和 tier）
+
+#### 禁碰文件
+- 除上面 5 个文件外的一切文件
+
+#### 实现要求
+1. Source 模型加：
+   - `quality_score: Mapped[float] = mapped_column(Float, default=0.5)`（0.1–1.0）
+   - `tier: Mapped[str] = mapped_column(String(16), default="tier-2")`（tier-1/tier-2/community/pending）
+2. DEFAULT_SOURCES 27 个源填初始值：
+   - tier-1（quality_score 0.9）：BBC, Reuters, AP, NYT, Guardian, NPR, WashPost, Al Jazeera, DW, France 24
+   - tier-2（0.7）：CNN, ABC, NBC, CBS, Sky News, USA Today, The Independent, Politico, The Hill
+   - tier-2（0.7）：Ars Technica, The Verge, WIRED, TechCrunch, CNBC, MarketWatch
+   - tier-2（0.8）：New Scientist, Scientific American
+3. `SourceScoringService.recalculate_all(db) -> int`：
+   - 遍历所有源
+   - 统计过去 30 天该源文章数、进入 digest 的比例、被 dedup 淘汰的比例
+   - 调分规则：
+     - 进 digest 比例 > 30% → +0.1
+     - 被 dedup 淘汰比例 > 70% → -0.1（转载源）
+     - clamp 到 [0.1, 1.0]
+   - 返回调整的源数量
+4. `SourceScoringService.get_quality_score(source_name: str) -> float`：便捷查询
+5. Alembic 迁移加字段 + 给现有源回填默认值
+6. 单元测试覆盖：调分逻辑、边界 clamp、无数据源保持默认、tier 不被调分改变
+
+#### 验收检查
+```bash
+cd services/api && python -m pytest tests/test_source_scoring_service.py -v
+cd services/api && python -m pytest -v  # 全量回归
+cd services/api && alembic upgrade head
+```
+
+#### 完成后 commit
+```bash
+git add services/api/app/services/source_scoring_service.py services/api/tests/test_source_scoring_service.py services/api/app/models/source.py services/api/alembic/versions/ services/api/app/services/source_service.py
+git commit -m "feat: source quality_score learning mechanism with tier classification"
+```
+
+---
+
+### Task P3: 重要性评分 + Topic 分区 Digest
+
+- **Status:** pending
+- **Owner:** —
+- **依赖:** P1-A + P1-B + P2 全部完成
+
+#### 任务
+实现 `ImportanceScorer` 规则评分（占最终分数 70%），并改造 `DigestGenerator` 按 topic 分区生成 digest。这是"抓不到重点"问题的核心解决方案。LLM editor 层（占 30%）在 P6 接 Hermes，本任务先空着用纯规则。
+
+#### 上下文文件（先读）
+- services/api/app/services/cluster_service.py — 现有聚类
+- services/api/app/services/digest_generator.py — 现有 digest 生成
+- services/api/app/models/cluster.py — Cluster 模型（已有 topic 字段，P1-B 加的）
+- services/api/app/models/source.py — Source 模型（已有 quality_score，P2 加的）
+- services/api/app/models/digest_entry.py — DigestEntry 模型
+- packages/shared-types/src/resources/digest.ts — DigestResource 契约
+- docs/architecture/news-pipeline-vision.md — 重要性评分公式 + topic 分区
+- docs/architecture/hermes-integration.md — LLM editor 占 30% 的设计
+
+#### 可以创建/修改的文件
+- services/api/app/services/importance_scorer.py — 新建
+- services/api/tests/test_importance_scorer.py — 新建
+- services/api/app/services/digest_generator.py — 修改（按 topic 分区 + 用 importance 排序）
+- services/api/app/models/cluster.py — 修改（加 importance_score 字段）
+- services/api/app/models/digest_entry.py — 修改（加 topic 字段，用于前端分区展示）
+- services/api/alembic/versions/<new>_add_importance_fields.py — 新建迁移
+- packages/shared-types/src/resources/digest.ts — 修改（DigestEntry 加 topic 字段）
+- packages/shared-types/src/index.ts — 修改（重新导出）
+
+#### 禁碰文件
+- 除上面 8 个文件外的一切文件
+- 不碰 services/api/app/routers/ 和 services/api/app/services/digest_query_service.py（契约变更由 P3-2 处理，见下）
+
+#### 实现要求
+1. `ImportanceScorer.score_cluster(cluster: Cluster, members: list[Article]) -> float`：
+   ```
+   rule_score = 
+     0.30 * source_diversity      # 去重后不同源数量 / 总源数
+     0.25 * avg_source_quality    # 成员源的平均 quality_score
+     0.20 * freshness_decay       # exp(-age_hours/24)
+     0.15 * tier_bonus            # 有 tier-1 源报道加分
+     0.10 * cluster_size          # 原始簇大小归一化
+   ```
+   - 权重可配置（放 `app/core/config.py` 或常量，不写死在函数里）
+   - 返回 0-1
+2. Cluster 模型加 `importance_score: Mapped[Optional[float]]`（0-1）
+3. DigestEntry 模型加 `topic: Mapped[Optional[str]]`（从 cluster 继承）
+4. `DigestGenerator.generate(target_date)` 改造：
+   - 对每个 cluster 算 importance_score
+   - 按 topic 分组
+   - 每个 topic 内按 importance_score 降序
+   - 多样性约束：单 topic 不超过 5 条，至少 3 个 topic 有 representation
+   - 总条数上限 20
+5. shared-types DigestEntry 加 `topic?: string`（optional，向后兼容）
+6. Alembic 迁移加字段
+7. 单元测试覆盖：评分计算、topic 分区、多样性约束、总条数上限、空数据、权重可配置
+
+#### 验收检查
+```bash
+cd services/api && python -m pytest tests/test_importance_scorer.py -v
+cd services/api && python -m pytest -v  # 全量回归
+cd services/api && alembic upgrade head
+cd apps/web && npm run build  # shared-types 变更不破坏前端
+cd apps/web && npm test
+```
+
+#### 完成后 commit
+```bash
+git add services/api/app/services/importance_scorer.py services/api/tests/test_importance_scorer.py services/api/app/services/digest_generator.py services/api/app/models/cluster.py services/api/app/models/digest_entry.py services/api/alembic/versions/ packages/shared-types/src/
+git commit -m "feat: importance scoring + topic-sectioned digest with diversity constraints"
+```
+
+---
 
 ### Task P6-A: L1-E01 实现应用壳与全局布局
 
@@ -484,6 +728,8 @@ git commit -m "feat: implement archive and detail query services"
 | **P6** | `b1ebc7c`~`7e2ab65` | 应用壳 (3) + 设计系统 (14) + 搜索状态 (28) + 性能可访问性 (14) + packages/ui |
 | P5/P6 验收修复 | (本提交) | structlog 加入 requirements + pipeline UTC 修复 + DigestEntry import 补全 |
 | **P7 (F01-F07)** | `a56a56c`~`f4f6ffb` | API 测试基线 (15) + 契约测试 (25) + Web 测试基线 (1) + E2E 测试 (6) + CI 流水线 + 预发环境 + 生产部署/日志/告警 |
+| 运营期前端改进 | `0bc1d98`~`773638d` | Header 重设计 + nav 居中 + sticky 冻结 + 中/英/双语切换 + HTML 清理 + 移动端适配 + 12 新 RSS 源 + seed 逻辑改追加 |
+| **P8 规划** | (本文档) | pipeline 质量地基任务编写（P1-A/P1-B/P2/P3）+ Hermes 集成方案 + pipeline vision 文档 |
 
 **合计：267 后端 pytest (266 ✅ + 1 xfail) + 168 前端 vitest = 435 tests 全部通过 ✅**
 （Vite 缓存并发导致 2 个 archive 页面测试批量运行时偶发失败，单独运行均通过；非代码问题）
@@ -497,11 +743,17 @@ git commit -m "feat: implement archive and detail query services"
 | ~~P5 第二波~~ | ~~D03, D04, D05~~ | ✅ 已完成 — 三路并行交付 |
 | ~~P6~~ | ~~E01/E02/E06/E09 + B04~~ | ✅ 已完成 — 五路并行交付 |
 | ~~**P7（最后一批）**~~ | ~~F01→F07~~ | ✅ **全部完成 — L1 首发版达到上线标准** |
+| **P8（当前）** | **P1-A/P1-B → P2 → P3** | 新闻 pipeline 质量地基（零 AI 成本） |
+| P9 | P4: WebScraper fetcher | 支持非 RSS 源 |
+| P10 | P5: 用户自订源 + 个人队列 | 开放性 |
+| P11 | P6: Hermes editor 集成 | 编辑判断自我进化（方案乙） |
+| P12 | P7: 个性化推荐 + 探索注入 | 留存 |
 
 ### 剩余任务总计
 
 | 阶段 | 剩余任务数 | 说明 |
 |------|-----------|------|
-| 所有 L1 任务 | 0 | 🎉 **L1 首发版全部完成** |
+| ~~所有 L1 任务~~ | ~~0~~ | 🎉 **L1 首发版全部完成** |
 | L2 运营后台 | ~5 | 下一阶段 |
 | L3 多客户端扩展 | ~3 | 未来阶段 |
+| **P8 pipeline 质量地基** | **4** | P1-A/P1-B/P2/P3（当前批次） |
