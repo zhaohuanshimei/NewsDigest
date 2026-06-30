@@ -14,7 +14,7 @@ const displaySummary = entry.summary_translated || entry.summary;
 <article class="digest-entry">
   <p class="digest-entry-rank">{entry.rank.toString().padStart(2, "0")}</p>
   <h3 class="digest-entry-headline">
-    <a class="digest-entry-link" href={`/clusters/${entry.cluster_id}`}>{displayHeadline}</a>
+    <a class="digest-entry-link" href={`/clusters/${entry.cluster_id}/`}>{displayHeadline}</a>
   </h3>
   <p class="digest-entry-summary">{displaySummary}</p>
   <p class="digest-entry-meta">{entry.source_count} sources</p>

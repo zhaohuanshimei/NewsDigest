@@ -12,3 +12,4 @@ standalone-skills/
 .secrets/
 test-results/
 playwright-report/
+.claude/worktrees/
