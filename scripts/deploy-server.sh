@@ -65,7 +65,15 @@ fi
 if [ "$API_ONLY" = false ]; then
     echo ""
     echo ">>> 构建 + 启动前端 (SSG 从 API 拉数据)..."
-    docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d --build web
+    # SSG 构建需要访问运行中的 API，用 --network host 让 builder 能访问 127.0.0.1:8001
+    docker build --network host \
+        -f infra/Dockerfile.web \
+        --build-arg NEWS_DIGEST_API_BASE_URL=http://127.0.0.1:8001/api/v1 \
+        --build-arg "PUBLIC_DIGEST_STATE=${PUBLIC_DIGEST_STATE:-}" \
+        --build-arg "SITE_URL=${SITE_URL:-https://news.maczhao.com}" \
+        -t infra-web:latest \
+        . 2>&1
+    docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up -d web
 fi
 
 # Step 4: 状态检查

@@ -38,7 +38,7 @@ services:
       context: ..
       dockerfile: infra/Dockerfile.web
       args:
-        NEWS_DIGEST_API_BASE_URL: http://news-digest-v2-api:8001/api/v1
+        NEWS_DIGEST_API_BASE_URL: http://127.0.0.1:8001/api/v1
         PUBLIC_DIGEST_STATE: ${PUBLIC_DIGEST_STATE:-}
         SITE_URL: ${SITE_URL:-https://news.maczhao.com}
     container_name: news-digest-v2-web
