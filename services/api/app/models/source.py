@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import Boolean, Integer, String, DateTime, Text
+from sqlalchemy import Boolean, Float, Integer, String, DateTime, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.base import Base
@@ -24,6 +24,8 @@ class Source(Base):
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     fetch_interval_minutes: Mapped[int] = mapped_column(Integer, default=30)
     last_fetched_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    quality_score: Mapped[float] = mapped_column(Float, default=0.5)
+    tier: Mapped[str] = mapped_column(String(16), default="tier-2")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow, onupdate=_utcnow
