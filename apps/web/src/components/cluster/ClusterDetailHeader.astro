@@ -9,12 +9,184 @@ interface Props {
 
 const { category, headline, summary, headlineTranslated, summaryTranslated } = Astro.props;
 
-const displayHeadline = headlineTranslated || headline;
-const displaySummary = summaryTranslated || summary;
+function stripHtml(text: string): string {
+  return text
+    .replace(/<[^>]*>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .trim();
+}
+
+const headlineZh = headlineTranslated || headline;
+const summaryZh = stripHtml(summaryTranslated || summary);
+const headlineEn = headline;
+const summaryEn = stripHtml(summary);
 ---
 
-<header class="cluster-header">
-  <p class="page-eyebrow">{category}</p>
-  <h1 class="cluster-title">{displayHeadline}</h1>
-  <p class="cluster-summary">{displaySummary}</p>
+<header class="cluster-header" id="cluster-header" data-lang="zh">
+  <div class="cluster-header-bar">
+    <p class="page-eyebrow">{category}</p>
+    <div class="cluster-lang-tools">
+      <button class="lang-btn is-active" data-lang="zh" data-target="cluster-header">中文</button>
+      <button class="lang-btn" data-lang="en" data-target="cluster-header">原文</button>
+      <button class="lang-btn" data-lang="both" data-target="cluster-header">双语</button>
+    </div>
+  </div>
+  <h1 class="cluster-title">{headlineZh}</h1>
+  <p class="cluster-summary">{summaryZh}</p>
+  <div class="cluster-bilingual">
+    <div class="bilingual-original">
+      <p class="bilingual-label">原文</p>
+      <p class="cluster-headline-en">{headlineEn}</p>
+      <p class="cluster-summary-en">{summaryEn}</p>
+    </div>
+  </div>
 </header>
+
+<style>
+  .cluster-header {
+    display: grid;
+    gap: 0.9rem;
+    padding: 0 1.5rem 2rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  .cluster-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cluster-lang-tools {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .lang-btn {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--surface-border);
+    background: transparent;
+    color: var(--muted-text);
+    cursor: pointer;
+    border-radius: 2px;
+    font-family: inherit;
+    transition: all 0.15s ease;
+  }
+
+  .lang-btn:hover {
+    color: var(--headline-text);
+    border-color: var(--headline-text);
+  }
+
+  .lang-btn.is-active {
+    background: var(--headline-text);
+    color: var(--page-background);
+    border-color: var(--headline-text);
+  }
+
+  .cluster-title {
+    max-width: 26ch;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+  }
+
+  .cluster-summary {
+    max-width: 42rem;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--muted-text);
+  }
+
+  .cluster-headline-en {
+    font-size: 1.15rem;
+    line-height: 1.4;
+    color: var(--headline-text);
+    margin-bottom: 0.5rem;
+  }
+
+  .cluster-summary-en {
+    font-size: 0.98rem;
+    line-height: 1.7;
+    color: var(--muted-text);
+  }
+
+  .cluster-bilingual {
+    display: none;
+  }
+
+  .bilingual-original {
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.03);
+    border-left: 2px solid var(--surface-border);
+  }
+
+  .bilingual-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+    margin-bottom: 0.4rem;
+  }
+
+  .cluster-header[data-lang="zh"] .cluster-bilingual {
+    display: none;
+  }
+
+  .cluster-header[data-lang="zh"] .cluster-headline-en,
+  .cluster-header[data-lang="zh"] .cluster-summary-en {
+    display: none;
+  }
+
+  .cluster-header[data-lang="en"] .cluster-title,
+  .cluster-header[data-lang="en"] .cluster-summary {
+    display: none;
+  }
+
+  .cluster-header[data-lang="en"] .cluster-headline-en {
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    color: var(--headline-text);
+    margin-bottom: 0.5rem;
+  }
+
+  .cluster-header[data-lang="both"] .cluster-bilingual {
+    display: block;
+  }
+
+  @media (min-width: 48rem) {
+    .cluster-header {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("click", (e) => {
+    const btn = (e.target as HTMLElement).closest(".lang-btn");
+    if (!btn) return;
+
+    const target = document.getElementById(
+      (btn as HTMLElement).getAttribute("data-target") || ""
+    );
+    if (!target) return;
+
+    const lang = (btn as HTMLElement).getAttribute("data-lang") || "zh";
+    target.setAttribute("data-lang", lang);
+
+    target.querySelectorAll(".lang-btn").forEach((b) => {
+      b.classList.toggle(
+        "is-active",
+        b.getAttribute("data-lang") === lang
+      );
+    });
+  });
+</script>

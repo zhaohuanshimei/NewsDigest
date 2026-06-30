@@ -7,15 +7,217 @@ interface Props {
 
 const { entry } = Astro.props;
 
-const displayHeadline = entry.headline_translated || entry.headline;
-const displaySummary = entry.summary_translated || entry.summary;
+function stripHtml(text: string): string {
+  return text
+    .replace(/<[^>]*>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .trim();
+}
+
+const headlineZh = entry.headline_translated || entry.headline;
+const summaryZh = stripHtml(entry.summary_translated || entry.summary);
+const headlineEn = entry.headline;
+const summaryEn = stripHtml(entry.summary);
+
+const entryId = `entry-${entry.rank}`;
 ---
 
-<article class="digest-entry">
-  <p class="digest-entry-rank">{entry.rank.toString().padStart(2, "0")}</p>
+<article class="digest-entry" id={entryId} data-lang="zh">
+  <div class="digest-entry-bar">
+    <p class="digest-entry-rank">{entry.rank.toString().padStart(2, "0")}</p>
+    <div class="digest-entry-lang-tools">
+      <button class="lang-btn is-active" data-lang="zh" data-entry={entryId}>中文</button>
+      <button class="lang-btn" data-lang="en" data-entry={entryId}>原文</button>
+      <button class="lang-btn" data-lang="both" data-entry={entryId}>双语</button>
+    </div>
+  </div>
   <h3 class="digest-entry-headline">
-    <a class="digest-entry-link" href={`/clusters/${entry.cluster_id}/`}>{displayHeadline}</a>
+    <a class="digest-entry-link" href={`/clusters/${entry.cluster_id}/`}>{headlineZh}</a>
   </h3>
-  <p class="digest-entry-summary">{displaySummary}</p>
+  <p class="digest-entry-summary">{summaryZh}</p>
+  <div class="digest-entry-bilingual">
+    <div class="bilingual-original">
+      <p class="bilingual-label">原文</p>
+      <p class="digest-entry-headline-en">{headlineEn}</p>
+      <p class="digest-entry-summary-en">{summaryEn}</p>
+    </div>
+  </div>
   <p class="digest-entry-meta">{entry.source_count} sources</p>
 </article>
+
+<script>
+  document.addEventListener("click", (e) => {
+    const btn = (e.target as HTMLElement).closest(".lang-btn");
+    if (!btn) return;
+
+    const entryEl = document.getElementById(
+      (btn as HTMLElement).getAttribute("data-entry") || ""
+    );
+    if (!entryEl) return;
+
+    const lang = (btn as HTMLElement).getAttribute("data-lang") || "zh";
+    entryEl.setAttribute("data-lang", lang);
+
+    entryEl.querySelectorAll(".lang-btn").forEach((b) => {
+      b.classList.toggle(
+        "is-active",
+        b.getAttribute("data-lang") === lang
+      );
+    });
+  });
+</script>
+
+<style>
+  .digest-entry {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  .digest-entry:last-child {
+    border-bottom: 0;
+  }
+
+  .digest-entry-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .digest-entry-lang-tools {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .lang-btn {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--surface-border);
+    background: transparent;
+    color: var(--muted-text);
+    cursor: pointer;
+    border-radius: 2px;
+    font-family: inherit;
+    transition: all 0.15s ease;
+  }
+
+  .lang-btn:hover {
+    color: var(--headline-text);
+    border-color: var(--headline-text);
+  }
+
+  .lang-btn.is-active {
+    background: var(--headline-text);
+    color: var(--page-background);
+    border-color: var(--headline-text);
+  }
+
+  .digest-entry-rank {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+  }
+
+  .digest-entry-headline {
+    max-width: 28ch;
+    font-size: clamp(1.35rem, 2vw, 1.8rem);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  .digest-entry-headline-en {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--muted-text);
+    margin-bottom: 0.5rem;
+  }
+
+  .digest-entry-summary {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--muted-text);
+  }
+
+  .digest-entry-summary-en {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--muted-text);
+  }
+
+  .digest-entry-meta {
+    font-size: 0.8rem;
+    color: var(--muted-text);
+  }
+
+  .digest-entry-bilingual {
+    display: none;
+  }
+
+  .bilingual-original {
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    background: rgba(0, 0, 0, 0.03);
+    border-left: 2px solid var(--surface-border);
+  }
+
+  .bilingual-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+    margin-bottom: 0.4rem;
+  }
+
+  .digest-entry-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .digest-entry-link:hover,
+  .digest-entry-link:focus-visible {
+    text-decoration: underline;
+  }
+
+  .digest-entry[data-lang="zh"] .digest-entry-bilingual,
+  .digest-entry[data-lang="en"] .digest-entry-bilingual {
+    display: none;
+  }
+
+  .digest-entry[data-lang="zh"] .digest-entry-headline-en,
+  .digest-entry[data-lang="zh"] .digest-entry-summary-en {
+    display: none;
+  }
+
+  .digest-entry[data-lang="en"] .digest-entry-headline,
+  .digest-entry[data-lang="en"] .digest-entry-summary {
+    display: none;
+  }
+
+  .digest-entry[data-lang="en"] .digest-entry-headline-en {
+    font-size: clamp(1.35rem, 2vw, 1.8rem);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    color: var(--headline-text);
+    margin-bottom: 0;
+  }
+
+  .digest-entry[data-lang="both"] .digest-entry-bilingual {
+    display: block;
+  }
+
+  @media (min-width: 48rem) {
+    .digest-entry {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+</style>
