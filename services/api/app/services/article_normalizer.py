@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.fetcher_interface import NormalizedArticle, make_dedupe_key
 from app.models.article import Article
 from app.repositories.article_repository import ArticleRepository
+from app.services.dedup_service import DedupService
 
 TRACKING_PARAMS: frozenset[str] = frozenset({
     "utm_source",
@@ -27,9 +28,11 @@ SUMMARY_MAX_LENGTH = 2000
 class ArticleNormalizer:
     """Normalizes articles: cleans URLs, sanitizes text, and prevents duplicates."""
 
-    def __init__(self, db: Session, repository: ArticleRepository | None = None) -> None:
+    def __init__(self, db: Session, repository: ArticleRepository | None = None,
+                 dedup_service: DedupService | None = None) -> None:
         self.db = db
         self.repository = repository or ArticleRepository(db)
+        self.dedup_service = dedup_service or DedupService(repository=self.repository)
 
     def normalize_article(self, article: NormalizedArticle) -> Article | None:
         """Normalize and persist an article, or return None if it is a duplicate."""
