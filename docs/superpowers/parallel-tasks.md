@@ -19,8 +19,9 @@
 
 ### Task P1-A: 多层去重服务
 
-- **Status:** pending
-- **Owner:** —
+- **Status:** done
+- **Owner:** agent-p1a-main
+- **Commit:** `7ca679c`
 
 #### 任务
 实现 `DedupService`，在现有 URL 精确匹配之上增加标题相似度层和内容相似度层，形成漏斗式去重。同事件跨源转载只保留 quality_score 最高的源的代表文章。
@@ -70,8 +71,9 @@ git commit -m "feat: implement multi-layer dedup service (URL + title + content 
 
 ### Task P1-B: Topic 分类服务（规则版）
 
-- **Status:** pending
-- **Owner:** —
+- **Status:** done
+- **Owner:** agent-p1b-main
+- **Commit:** `ceb7024`
 
 #### 任务
 实现 `TopicClassifier`，基于关键词规则对文章做 topic 分类。零 AI 成本、可解释、效果够用。后续可被 LLM 分类替换，但接口保持稳定。
@@ -123,8 +125,9 @@ git commit -m "feat: implement rule-based topic classifier with article/cluster 
 
 ### Task P2: 源 quality_score 学习机制
 
-- **Status:** pending
-- **Owner:** —
+- **Status:** done
+- **Owner:** main
+- **Commit:** `6b4655e`
 - **依赖:** P1-B 完成（topic 字段需要先存在，用于统计进 digest 比例）
 
 #### 任务
@@ -187,8 +190,9 @@ git commit -m "feat: source quality_score learning mechanism with tier classific
 
 ### Task P3: 重要性评分 + Topic 分区 Digest
 
-- **Status:** pending
-- **Owner:** —
+- **Status:** done
+- **Owner:** main
+- **Commit:** `118c7a4`
 - **依赖:** P1-A + P1-B + P2 全部完成
 
 #### 任务
@@ -730,8 +734,9 @@ git commit -m "feat: implement archive and detail query services"
 | **P7 (F01-F07)** | `a56a56c`~`f4f6ffb` | API 测试基线 (15) + 契约测试 (25) + Web 测试基线 (1) + E2E 测试 (6) + CI 流水线 + 预发环境 + 生产部署/日志/告警 |
 | 运营期前端改进 | `0bc1d98`~`773638d` | Header 重设计 + nav 居中 + sticky 冻结 + 中/英/双语切换 + HTML 清理 + 移动端适配 + 12 新 RSS 源 + seed 逻辑改追加 |
 | **P8 规划** | (本文档) | pipeline 质量地基任务编写（P1-A/P1-B/P2/P3）+ Hermes 集成方案 + pipeline vision 文档 |
+| **P8 实施** | `7ca679c`~`118c7a4` | **P1-A** DedupService 25 + **P1-B** TopicClassifier 18 + **P2** SourceScoringService 12 + **P3** ImportanceScorer 13 = 68 tests |
 
-**合计：267 后端 pytest (266 ✅ + 1 xfail) + 168 前端 vitest = 435 tests 全部通过 ✅**
+**合计：347 后端 pytest (347 ✅ + 1 xfail) + 168 前端 vitest = 515 tests 全部通过 ✅**
 （Vite 缓存并发导致 2 个 archive 页面测试批量运行时偶发失败，单独运行均通过；非代码问题）
 
 ## 后续批次规划
