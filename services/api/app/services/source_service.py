@@ -62,6 +62,70 @@ DEFAULT_SOURCES: list[dict] = [
         "enabled": True,
         "fetch_interval_minutes": 30,
     },
+    {
+        "name": "Al Jazeera English",
+        "kind": "rss",
+        "url": "https://www.aljazeera.com/xml/rss/all.xml",
+        "language": "en",
+        "enabled": True,
+        "fetch_interval_minutes": 30,
+    },
+    {
+        "name": "Washington Post",
+        "kind": "rss",
+        "url": "https://feeds.washingtonpost.com/rss/world",
+        "language": "en",
+        "enabled": True,
+        "fetch_interval_minutes": 30,
+    },
+    {
+        "name": "ABC News",
+        "kind": "rss",
+        "url": "https://abcnews.go.com/abcnews/topstories",
+        "language": "en",
+        "enabled": True,
+        "fetch_interval_minutes": 30,
+    },
+    {
+        "name": "NBC News",
+        "kind": "rss",
+        "url": "https://feeds.nbcnews.com/nbcnews/public/news",
+        "language": "en",
+        "enabled": True,
+        "fetch_interval_minutes": 30,
+    },
+    {
+        "name": "The Hill",
+        "kind": "rss",
+        "url": "https://thehill.com/feed",
+        "language": "en",
+        "enabled": True,
+        "fetch_interval_minutes": 30,
+    },
+    {
+        "name": "Politico",
+        "kind": "rss",
+        "url": "https://rss.politico.com/politics.xml",
+        "language": "en",
+        "enabled": True,
+        "fetch_interval_minutes": 30,
+    },
+    {
+        "name": "Sky News",
+        "kind": "rss",
+        "url": "https://feeds.skynews.com/feeds/rss/home.xml",
+        "language": "en",
+        "enabled": True,
+        "fetch_interval_minutes": 30,
+    },
+    {
+        "name": "DW (Deutsche Welle)",
+        "kind": "rss",
+        "url": "https://rss.dw.com/rdf/rss-en-all",
+        "language": "en",
+        "enabled": True,
+        "fetch_interval_minutes": 30,
+    },
 ]
 
 
@@ -74,14 +138,11 @@ class SourceService:
         return list(DEFAULT_SOURCES)
 
     def seed_default_sources(self, db: Session) -> list[Source]:
-        existing = self.repository.list_all()
-        if existing:
-            return existing
-        created = []
+        existing_names = {s.name for s in self.repository.list_all()}
         for data in DEFAULT_SOURCES:
-            source = self.repository.create(**data)
-            created.append(source)
-        return created
+            if data["name"] not in existing_names:
+                self.repository.create(**data)
+        return self.repository.list_all()
 
     def get_active_fetchable_sources(self) -> list[Source]:
         return self.repository.get_active_fetchable_sources()

@@ -37,8 +37,10 @@ class TestSourceService:
         repo.create(name="Existing", kind="rss", url="https://existing.com/rss")
         svc = SourceService(repo)
         seeded = svc.seed_default_sources(db_session)
-        assert len(seeded) == 1
-        assert seeded[0].name == "Existing"
+        names = {s.name for s in seeded}
+        assert "Existing" in names
+        for src in svc.get_default_sources():
+            assert src["name"] in names
 
     def test_get_active_fetchable_sources(self, db_session):
         repo = SourceRepository(db_session)

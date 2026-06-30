@@ -13,6 +13,8 @@ const navLinks = [
 ];
 ---
 
+<div class="nav-sentinel" aria-hidden="true"></div>
+
 <nav class="site-nav" aria-label="Main navigation">
   <ul class="site-nav-links">
     {navLinks.map((link) => (
@@ -41,35 +43,66 @@ const navLinks = [
 </nav>
 
 <script>
-  document.addEventListener("click", (e) => {
-    const btn = (e.target as HTMLElement).closest("[data-global-lang]");
-    if (!btn) return;
+  (function () {
+    const header = document.querySelector(".site-header");
+    const nav = document.querySelector(".site-nav");
 
-    const lang = (btn as HTMLElement).getAttribute("data-global-lang") || "zh";
+    if (header && nav && "IntersectionObserver" in window) {
+      new IntersectionObserver(
+        function (entries) {
+          nav.classList.toggle("is-stuck", !entries[0].isIntersecting);
+        },
+        { threshold: [0] }
+      ).observe(header);
+    }
 
-    document.querySelectorAll("[data-global-lang]").forEach((b) => {
-      const active = b.getAttribute("data-global-lang") === lang;
-      (b as HTMLElement).classList.toggle("is-active", active);
-      (b as HTMLElement).setAttribute("aria-selected", String(active));
-    });
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-global-lang]");
+      if (!btn) return;
 
-    document.querySelectorAll(".digest-entry, .cluster-header").forEach((el) => {
-      el.setAttribute("data-lang", lang);
-      el.querySelectorAll(".lang-btn").forEach((b) => {
-        b.classList.toggle(
-          "is-active",
-          b.getAttribute("data-lang") === lang
-        );
+      var lang = btn.getAttribute("data-global-lang") || "zh";
+
+      document.querySelectorAll("[data-global-lang]").forEach(function (b) {
+        var active = b.getAttribute("data-global-lang") === lang;
+        b.classList.toggle("is-active", active);
+        b.setAttribute("aria-selected", String(active));
+      });
+
+      document.querySelectorAll(".digest-entry, .cluster-header").forEach(function (el) {
+        el.setAttribute("data-lang", lang);
+        el.querySelectorAll(".lang-btn").forEach(function (b) {
+          b.classList.toggle(
+            "is-active",
+            b.getAttribute("data-lang") === lang
+          );
+        });
       });
     });
-  });
+  })();
 </script>
 
 <style>
+  .nav-sentinel {
+    height: 1px;
+    margin-top: -1px;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
   .site-nav {
     display: flex;
     justify-content: center;
-    padding-bottom: 0.5rem;
+    padding: 0.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--page-background);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .site-nav.is-stuck {
+    border-bottom: 1px solid var(--surface-border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   }
 
   .site-nav-links {
