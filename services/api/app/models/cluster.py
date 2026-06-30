@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import Integer, Float, DateTime, ForeignKey
+from sqlalchemy import Integer, Float, String, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.base import Base
@@ -22,6 +22,7 @@ class Cluster(Base):
     )
     size: Mapped[int] = mapped_column(Integer, default=1)
     score: Mapped[float] = mapped_column(Float, default=0.0)
+    topic: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
     first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     last_updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow, onupdate=_utcnow
