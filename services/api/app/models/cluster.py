@@ -22,6 +22,7 @@ class Cluster(Base):
     )
     size: Mapped[int] = mapped_column(Integer, default=1)
     score: Mapped[float] = mapped_column(Float, default=0.0)
+    importance_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     topic: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
     first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     last_updated_at: Mapped[datetime] = mapped_column(

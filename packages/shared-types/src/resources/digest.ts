@@ -2,6 +2,7 @@ export interface DigestEntryResource {
   cluster_id: string;
   rank: number;
   category: string;
+  topic?: string;
   headline: string;
   summary: string;
   source_count: number;

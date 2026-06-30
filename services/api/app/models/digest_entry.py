@@ -25,6 +25,7 @@ class DigestEntry(Base):
     )
     rank: Mapped[int] = mapped_column(Integer, nullable=False)
     category: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    topic: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
     headline: Mapped[str] = mapped_column(Text, nullable=False)
     summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     source_count: Mapped[int] = mapped_column(Integer, default=1)
