@@ -35,6 +35,7 @@ echo ""
 # Step 1: 拉取最新代码
 echo ">>> 拉取最新代码..."
 git checkout -- .
+git clean -fd
 git pull --ff-only
 
 # Step 2: 部署 API

@@ -13,3 +13,4 @@ standalone-skills/
 test-results/
 playwright-report/
 .claude/worktrees/
+.claude/agents/
