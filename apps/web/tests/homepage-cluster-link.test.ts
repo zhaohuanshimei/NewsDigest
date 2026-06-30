@@ -24,6 +24,6 @@ describe("homepage cluster link build", () => {
 
     const html = readFileSync(resolve(appDir, outDir, "index.html"), "utf8");
 
-    expect(html).toContain('href="/clusters/cluster-ai-chip-001"');
+    expect(html).toContain('href="/clusters/cluster-ai-chip-001/"');
   }, 60000);
 });
