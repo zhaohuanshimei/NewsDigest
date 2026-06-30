@@ -8,4 +8,6 @@ export interface DigestEntryResource {
   headline: string;
   summary: string;
   source_count: number;
+  headline_translated?: string;
+  summary_translated?: string;
 }

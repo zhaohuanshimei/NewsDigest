@@ -7,8 +7,23 @@ import ErrorState from "../../components/states/ErrorState.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../lib/config/site";
 import { loadClusterDetail } from "../../lib/content/getClusterDetail";
+import { readApiBaseUrl } from "../../lib/config/site";
 
-export const getStaticPaths = (() => {
+export const getStaticPaths = (async () => {
+  const apiBaseUrl = readApiBaseUrl(import.meta.env.NEWS_DIGEST_API_BASE_URL);
+  try {
+    const response = await fetch(`${apiBaseUrl}/digests/latest`, {
+      headers: { accept: "application/json" },
+    });
+    if (response.ok) {
+      const data = (await response.json()) as { entries: Array<{ cluster_id: string }> };
+      return data.entries.map((entry: { cluster_id: string }) => ({
+        params: { id: entry.cluster_id },
+      }));
+    }
+  } catch {
+    // API not available during build - fall through to default
+  }
   return [{ params: { id: "cluster-ai-chip-001" } }];
 }) satisfies GetStaticPaths;
 
@@ -25,6 +40,8 @@ const clusterState = await loadClusterDetail(clusterId);
             category={clusterState.cluster.category}
             headline={clusterState.cluster.headline}
             summary={clusterState.cluster.summary}
+            headlineTranslated={clusterState.cluster.headline_translated}
+            summaryTranslated={clusterState.cluster.summary_translated}
           />
           <ClusterMetaList
             sourceCount={clusterState.cluster.source_count}

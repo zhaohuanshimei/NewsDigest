@@ -5,6 +5,10 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from app.repositories.archive_query_repository import ArchiveQueryRepository
+from app.repositories.translation_repository import TranslationRepository
+
+
+TARGET_LANGUAGE = "zh"
 
 
 class ArchiveQueryService:
@@ -21,6 +25,7 @@ class ArchiveQueryService:
     def __init__(self, db: Session):
         self.db = db
         self.repo = ArchiveQueryRepository(db)
+        self.translation_repo = TranslationRepository(db)
 
     def get_archive_dates(self, limit: int = 30) -> list[str]:
         """获取归档日期列表。
@@ -64,6 +69,16 @@ class ArchiveQueryService:
         # 取 rank 最高的 entry 作为代表
         primary_entry = min(cluster.digest_entries, key=lambda e: e.rank)
 
+        # 查找该 entry 的翻译
+        headline_translated = ""
+        summary_translated = ""
+        translation = self.translation_repo.get_completed_translation(
+            primary_entry.id, TARGET_LANGUAGE
+        )
+        if translation:
+            headline_translated = translation.translated_title or ""
+            summary_translated = translation.translated_summary or ""
+
         # 获取该 cluster 出现过的所有 digest 日期
         digest_dates = self.repo.get_digest_dates_for_cluster(cluster_id)
 
@@ -73,7 +88,9 @@ class ArchiveQueryService:
             "headline": primary_entry.headline or "",
             "summary": primary_entry.summary or "",
             "source_count": primary_entry.source_count,
-            "digest_dates": [d.isoformat() for d in digest_dates]
+            "digest_dates": [d.isoformat() for d in digest_dates],
+            "headline_translated": headline_translated,
+            "summary_translated": summary_translated,
         }
 
     def get_article_detail(self, article_id: int) -> dict[str, Any] | None:

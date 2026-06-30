@@ -6,7 +6,11 @@ from datetime import date
 from sqlalchemy.orm import Session
 
 from app.repositories.digest_query_repository import DigestQueryRepository
+from app.repositories.translation_repository import TranslationRepository
 from app.schemas.digest import DigestResource, DigestEntryResource
+
+
+TARGET_LANGUAGE = "zh"
 
 
 class DigestQueryService:
@@ -15,6 +19,7 @@ class DigestQueryService:
     def __init__(self, db: Session):
         self.db = db
         self.repo = DigestQueryRepository(db)
+        self.translation_repo = TranslationRepository(db)
 
     def get_latest(self) -> DigestResource | None:
         """Get the latest digest as DigestResource."""
@@ -41,6 +46,9 @@ class DigestQueryService:
         entries = []
         if digest.entries:
             for entry in digest.entries:
+                translation = self.translation_repo.get_completed_translation(
+                    entry.id, TARGET_LANGUAGE
+                )
                 entries.append(
                     DigestEntryResource(
                         cluster_id=str(entry.cluster_id),
@@ -49,10 +57,11 @@ class DigestQueryService:
                         headline=entry.headline,
                         summary=entry.summary or "",
                         source_count=entry.source_count,
+                        headline_translated=translation.translated_title if translation else "",
+                        summary_translated=translation.translated_summary if translation else "",
                     )
                 )
 
-        # Format published_at as ISO string
         published_at = ""
         if digest.published_at:
             published_at = digest.published_at.isoformat()

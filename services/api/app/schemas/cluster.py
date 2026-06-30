@@ -8,3 +8,5 @@ class ClusterDetailResource(BaseModel):
     summary: str
     source_count: int
     digest_dates: list[str]
+    headline_translated: str = ""
+    summary_translated: str = ""

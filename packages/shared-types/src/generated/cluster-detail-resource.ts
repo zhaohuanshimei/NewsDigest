@@ -8,4 +8,6 @@ export interface ClusterDetailResource {
   summary: string;
   source_count: number;
   digest_dates: string[];
+  headline_translated?: string;
+  summary_translated?: string;
 }

@@ -217,7 +217,7 @@ def _ts_field_names(ts_file: str, interface_name: str) -> set[str]:
             continue
         # Match "field_name: type" pattern
         if ":" in stripped:
-            field_name = stripped.split(":")[0].strip()
+            field_name = stripped.split(":")[0].strip().rstrip("?")
             # Skip array closing brackets
             if field_name and not field_name.startswith("}"):
                 fields.add(field_name)

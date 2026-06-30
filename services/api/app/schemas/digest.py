@@ -8,6 +8,8 @@ class DigestEntryResource(BaseModel):
     headline: str
     summary: str
     source_count: int
+    headline_translated: str = ""
+    summary_translated: str = ""
 
 
 class DigestResource(BaseModel):
