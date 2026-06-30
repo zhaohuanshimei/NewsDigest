@@ -5,7 +5,8 @@ import { SITE_TITLE } from "../../lib/config/site";
 <header class="site-header" role="banner">
   <div class="site-header-inner">
     <a href="/" class="site-header-home" aria-label={`${SITE_TITLE} home`}>
-      <span class="site-header-title">{SITE_TITLE}</span>
+      <span class="site-header-word site-header-word--light">News</span>
+      <span class="site-header-word site-header-word--bold">Digest</span>
     </a>
   </div>
 </header>
@@ -19,22 +20,32 @@ import { SITE_TITLE } from "../../lib/config/site";
   .site-header-inner {
     display: flex;
     align-items: center;
-    width: min(100%, 52rem);
+    width: min(100%, 64rem);
     margin: 0 auto;
-    padding: 1.25rem 1.5rem;
+    padding: 2rem 1.5rem 1.5rem;
   }
 
   .site-header-home {
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--headline-text);
+    display: flex;
+    gap: 0.35rem;
     text-decoration: none;
+    line-height: 1;
   }
 
-  .site-header-title {
+  .site-header-word {
+    font-size: 2rem;
+    letter-spacing: -0.03em;
+    color: var(--headline-text);
     line-height: 1;
+  }
+
+  .site-header-word--light {
+    font-weight: 200;
+  }
+
+  .site-header-word--bold {
+    font-weight: 800;
+    letter-spacing: 0.04em;
   }
 
   @media (min-width: 48rem) {

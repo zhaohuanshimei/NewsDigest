@@ -31,19 +31,21 @@ const summaryEn = stripHtml(summary);
   <div class="cluster-header-bar">
     <p class="page-eyebrow">{category}</p>
     <div class="cluster-lang-tools">
-      <button class="lang-btn is-active" data-lang="zh" data-target="cluster-header">中文</button>
-      <button class="lang-btn" data-lang="en" data-target="cluster-header">原文</button>
-      <button class="lang-btn" data-lang="both" data-target="cluster-header">双语</button>
+      <button class="lang-btn is-active" data-lang="zh" data-target="cluster-header">中</button>
+      <button class="lang-btn" data-lang="en" data-target="cluster-header">EN</button>
+      <button class="lang-btn" data-lang="both" data-target="cluster-header">中+EN</button>
     </div>
   </div>
-  <h1 class="cluster-title">{headlineZh}</h1>
-  <p class="cluster-summary">{summaryZh}</p>
-  <div class="cluster-bilingual">
-    <div class="bilingual-original">
-      <p class="bilingual-label">原文</p>
-      <p class="cluster-headline-en">{headlineEn}</p>
-      <p class="cluster-summary-en">{summaryEn}</p>
-    </div>
+
+  <div class="d-zh">
+    <h1 class="cluster-title">{headlineZh}</h1>
+    <p class="cluster-summary">{summaryZh}</p>
+  </div>
+
+  <div class="d-en">
+    <p class="d-en-label">原文</p>
+    <h1 class="cluster-title">{headlineEn}</h1>
+    <p class="cluster-summary">{summaryEn}</p>
   </div>
 </header>
 
@@ -63,12 +65,12 @@ const summaryEn = stripHtml(summary);
 
   .cluster-lang-tools {
     display: flex;
-    gap: 0.25rem;
+    gap: 0.15rem;
   }
 
   .lang-btn {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
     border: 1px solid var(--surface-border);
     background: transparent;
     color: var(--muted-text);
@@ -103,30 +105,11 @@ const summaryEn = stripHtml(summary);
     color: var(--muted-text);
   }
 
-  .cluster-headline-en {
-    font-size: 1.15rem;
-    line-height: 1.4;
-    color: var(--headline-text);
-    margin-bottom: 0.5rem;
-  }
-
-  .cluster-summary-en {
-    font-size: 0.98rem;
-    line-height: 1.7;
-    color: var(--muted-text);
-  }
-
-  .cluster-bilingual {
+  .d-en {
     display: none;
   }
 
-  .bilingual-original {
-    padding: 0.75rem;
-    background: rgba(0, 0, 0, 0.03);
-    border-left: 2px solid var(--surface-border);
-  }
-
-  .bilingual-label {
+  .d-en-label {
     font-size: 0.65rem;
     font-weight: 600;
     letter-spacing: 0.1em;
@@ -135,30 +118,26 @@ const summaryEn = stripHtml(summary);
     margin-bottom: 0.4rem;
   }
 
-  .cluster-header[data-lang="zh"] .cluster-bilingual {
+  .cluster-header[data-lang="en"] .d-zh {
     display: none;
   }
 
-  .cluster-header[data-lang="zh"] .cluster-headline-en,
-  .cluster-header[data-lang="zh"] .cluster-summary-en {
+  .cluster-header[data-lang="en"] .d-en {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .cluster-header[data-lang="en"] .d-en-label {
     display: none;
   }
 
-  .cluster-header[data-lang="en"] .cluster-title,
-  .cluster-header[data-lang="en"] .cluster-summary {
-    display: none;
-  }
-
-  .cluster-header[data-lang="en"] .cluster-headline-en {
-    font-size: clamp(2rem, 4vw, 3rem);
-    line-height: 1.05;
-    letter-spacing: -0.035em;
-    color: var(--headline-text);
-    margin-bottom: 0.5rem;
-  }
-
-  .cluster-header[data-lang="both"] .cluster-bilingual {
-    display: block;
+  .cluster-header[data-lang="both"] .d-en {
+    display: grid;
+    gap: 0.9rem;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    background: rgba(0, 0, 0, 0.03);
+    border-left: 2px solid var(--surface-border);
   }
 
   @media (min-width: 48rem) {

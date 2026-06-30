@@ -29,17 +29,52 @@ const navLinks = [
         </a>
       </li>
     ))}
+
+    <li class="site-nav-sep" aria-hidden="true" role="separator"></li>
+
+    <li class="site-nav-toggle-group" role="tablist" aria-label="Language">
+      <button class="nav-toggle-btn" data-global-lang="en" role="tab" aria-selected="false">原文</button>
+      <button class="nav-toggle-btn is-active" data-global-lang="zh" role="tab" aria-selected="true">中文</button>
+      <button class="nav-toggle-btn" data-global-lang="both" role="tab" aria-selected="false">双语</button>
+    </li>
   </ul>
 </nav>
+
+<script>
+  document.addEventListener("click", (e) => {
+    const btn = (e.target as HTMLElement).closest("[data-global-lang]");
+    if (!btn) return;
+
+    const lang = (btn as HTMLElement).getAttribute("data-global-lang") || "zh";
+
+    document.querySelectorAll("[data-global-lang]").forEach((b) => {
+      const active = b.getAttribute("data-global-lang") === lang;
+      (b as HTMLElement).classList.toggle("is-active", active);
+      (b as HTMLElement).setAttribute("aria-selected", String(active));
+    });
+
+    document.querySelectorAll(".digest-entry, .cluster-header").forEach((el) => {
+      el.setAttribute("data-lang", lang);
+      el.querySelectorAll(".lang-btn").forEach((b) => {
+        b.classList.toggle(
+          "is-active",
+          b.getAttribute("data-lang") === lang
+        );
+      });
+    });
+  });
+</script>
 
 <style>
   .site-nav {
     display: flex;
     justify-content: center;
+    padding-bottom: 0.5rem;
   }
 
   .site-nav-links {
     display: flex;
+    align-items: center;
     gap: 1.5rem;
     list-style: none;
     margin: 0;
@@ -51,6 +86,7 @@ const navLinks = [
     color: var(--muted-text);
     text-decoration: none;
     transition: color 0.15s ease;
+    white-space: nowrap;
   }
 
   .site-nav-link:hover,
@@ -60,5 +96,60 @@ const navLinks = [
 
   .site-nav-link.is-active {
     color: var(--headline-text);
+  }
+
+  .site-nav-sep {
+    width: 1px;
+    height: 1rem;
+    background: var(--surface-border);
+  }
+
+  .site-nav-toggle-group {
+    display: flex;
+    gap: 0.15rem;
+  }
+
+  .nav-toggle-btn {
+    font-size: 0.75rem;
+    font-family: inherit;
+    padding: 0.15rem 0.45rem;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted-text);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .nav-toggle-btn:hover {
+    color: var(--headline-text);
+    border-color: var(--surface-border);
+  }
+
+  .nav-toggle-btn.is-active {
+    background: var(--headline-text);
+    color: var(--page-background);
+    border-color: var(--headline-text);
+  }
+
+  @media (max-width: 36rem) {
+    .site-nav-links {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem 1rem;
+      padding: 0 1rem;
+    }
+
+    .site-nav-sep {
+      display: none;
+    }
+
+    .site-nav-toggle-group {
+      width: 100%;
+      justify-content: center;
+      padding-top: 0.4rem;
+      border-top: 1px solid var(--surface-border);
+    }
   }
 </style>

@@ -31,22 +31,25 @@ const entryId = `entry-${entry.rank}`;
   <div class="digest-entry-bar">
     <p class="digest-entry-rank">{entry.rank.toString().padStart(2, "0")}</p>
     <div class="digest-entry-lang-tools">
-      <button class="lang-btn is-active" data-lang="zh" data-entry={entryId}>中文</button>
-      <button class="lang-btn" data-lang="en" data-entry={entryId}>原文</button>
-      <button class="lang-btn" data-lang="both" data-entry={entryId}>双语</button>
+      <button class="lang-btn is-active" data-lang="zh" data-entry={entryId}>中</button>
+      <button class="lang-btn" data-lang="en" data-entry={entryId}>EN</button>
+      <button class="lang-btn" data-lang="both" data-entry={entryId}>中+EN</button>
     </div>
   </div>
-  <h3 class="digest-entry-headline">
-    <a class="digest-entry-link" href={`/clusters/${entry.cluster_id}/`}>{headlineZh}</a>
-  </h3>
-  <p class="digest-entry-summary">{summaryZh}</p>
-  <div class="digest-entry-bilingual">
-    <div class="bilingual-original">
-      <p class="bilingual-label">原文</p>
-      <p class="digest-entry-headline-en">{headlineEn}</p>
-      <p class="digest-entry-summary-en">{summaryEn}</p>
-    </div>
+
+  <div class="d-zh">
+    <h3 class="digest-entry-headline">
+      <a class="digest-entry-link" href={`/clusters/${entry.cluster_id}/`}>{headlineZh}</a>
+    </h3>
+    <p class="digest-entry-summary">{summaryZh}</p>
   </div>
+
+  <div class="d-en">
+    <p class="d-en-label">原文</p>
+    <h3 class="digest-entry-headline">{headlineEn}</h3>
+    <p class="digest-entry-summary">{summaryEn}</p>
+  </div>
+
   <p class="digest-entry-meta">{entry.source_count} sources</p>
 </article>
 
@@ -92,12 +95,12 @@ const entryId = `entry-${entry.rank}`;
 
   .digest-entry-lang-tools {
     display: flex;
-    gap: 0.25rem;
+    gap: 0.15rem;
   }
 
   .lang-btn {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
     border: 1px solid var(--surface-border);
     background: transparent;
     color: var(--muted-text);
@@ -133,48 +136,15 @@ const entryId = `entry-${entry.rank}`;
     letter-spacing: -0.025em;
   }
 
-  .digest-entry-headline-en {
-    font-size: 1rem;
-    line-height: 1.5;
-    color: var(--muted-text);
-    margin-bottom: 0.5rem;
-  }
-
   .digest-entry-summary {
     font-size: 0.95rem;
     line-height: 1.7;
     color: var(--muted-text);
   }
 
-  .digest-entry-summary-en {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: var(--muted-text);
-  }
-
   .digest-entry-meta {
     font-size: 0.8rem;
     color: var(--muted-text);
-  }
-
-  .digest-entry-bilingual {
-    display: none;
-  }
-
-  .bilingual-original {
-    padding: 0.75rem;
-    margin-top: 0.5rem;
-    background: rgba(0, 0, 0, 0.03);
-    border-left: 2px solid var(--surface-border);
-  }
-
-  .bilingual-label {
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted-text);
-    margin-bottom: 0.4rem;
   }
 
   .digest-entry-link {
@@ -187,31 +157,39 @@ const entryId = `entry-${entry.rank}`;
     text-decoration: underline;
   }
 
-  .digest-entry[data-lang="zh"] .digest-entry-bilingual,
-  .digest-entry[data-lang="en"] .digest-entry-bilingual {
+  .d-en {
     display: none;
   }
 
-  .digest-entry[data-lang="zh"] .digest-entry-headline-en,
-  .digest-entry[data-lang="zh"] .digest-entry-summary-en {
+  .d-en-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-text);
+    margin-bottom: 0.4rem;
+  }
+
+  .digest-entry[data-lang="en"] .d-zh {
     display: none;
   }
 
-  .digest-entry[data-lang="en"] .digest-entry-headline,
-  .digest-entry[data-lang="en"] .digest-entry-summary {
+  .digest-entry[data-lang="en"] .d-en {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .digest-entry[data-lang="en"] .d-en-label {
     display: none;
   }
 
-  .digest-entry[data-lang="en"] .digest-entry-headline-en {
-    font-size: clamp(1.35rem, 2vw, 1.8rem);
-    line-height: 1.2;
-    letter-spacing: -0.025em;
-    color: var(--headline-text);
-    margin-bottom: 0;
-  }
-
-  .digest-entry[data-lang="both"] .digest-entry-bilingual {
-    display: block;
+  .digest-entry[data-lang="both"] .d-en {
+    display: grid;
+    gap: 0.85rem;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    background: rgba(0, 0, 0, 0.03);
+    border-left: 2px solid var(--surface-border);
   }
 
   @media (min-width: 48rem) {
