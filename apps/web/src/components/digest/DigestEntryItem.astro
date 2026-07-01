@@ -33,7 +33,7 @@ const sourceText = sources.length > 0
   : `${entry.source_count} sources`;
 ---
 
-<article class="digest-entry" id={entryId} data-lang="zh">
+<article class="digest-entry" id={entryId} data-lang="zh" data-category={entry.category || "general"}>
   {imageUrl && (
     <div class="digest-entry-media">
       <img src={imageUrl} alt={headlineEn} loading="lazy" class="digest-entry-image" />
@@ -247,6 +247,33 @@ const sourceText = sources.length > 0
     .digest-entry {
       padding-left: 2rem;
       padding-right: 2rem;
+    }
+  }
+
+  /* ---- Image layout: left / right ---- */
+
+  body[data-img-layout="left"] .digest-entry-media,
+  body[data-img-layout="right"] .digest-entry-media {
+    width: 38%;
+    margin-bottom: 0;
+  }
+
+  body[data-img-layout="left"] .digest-entry-media {
+    float: left;
+    margin-right: 1.75rem;
+  }
+
+  body[data-img-layout="right"] .digest-entry-media {
+    float: right;
+    margin-left: 1.75rem;
+  }
+
+  @media (max-width: 48rem) {
+    body[data-img-layout="left"] .digest-entry-media,
+    body[data-img-layout="right"] .digest-entry-media {
+      float: none;
+      width: 100%;
+      margin: 0 0 0.25rem;
     }
   }
 </style>

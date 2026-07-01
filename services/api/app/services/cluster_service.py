@@ -38,8 +38,11 @@ class ClusterService:
     # 公共入口
     # ------------------------------------------------------------------
 
-    def cluster_articles(self, since: datetime) -> int:
-        """对 since 之后（含）创建的文章执行聚类，返回新建 cluster 数量。"""
+    def cluster_articles(self, since: datetime, max_articles: int = 500) -> int:
+        """对 since 之后（含）创建的文章执行聚类，返回新建 cluster 数量。
+
+        max_articles: 单次最多处理文章数（O(n²) 保护）。
+        """
         articles = self._load_articles_since(since)
         if not articles:
             return 0
@@ -48,6 +51,10 @@ class ClusterService:
         pending = [a for a in articles if a.id not in already_clustered]
         if not pending:
             return 0
+
+        # 取最近的文章进行聚类，控制 O(n²) 规模
+        if len(pending) > max_articles:
+            pending = sorted(pending, key=lambda a: a.created_at, reverse=True)[:max_articles]
 
         groups = self._group_by_similarity(pending)
 
@@ -85,44 +92,34 @@ class ClusterService:
     def _group_by_similarity(self, articles: list[Article]) -> list[list[Article]]:
         """TF-IDF + cosine 相似度贪心分组。
 
-        优化：先按 topic 预分组，只在同 topic 内算相似度，减少 O(n²) 比较量。
+        在全体文章上计算相似度（不按 topic 分组），避免同事件不同 topic
+        的文章漏掉聚类。对同一组内的多篇文章只选一篇作为代表向量比对。
         """
         from sklearn.feature_extraction.text import TfidfVectorizer
         from sklearn.metrics.pairwise import cosine_similarity
 
-        # Pre-group by topic to reduce comparisons
-        topic_groups: dict[str, list[Article]] = {}
-        for a in articles:
-            t = a.topic or "general"
-            topic_groups.setdefault(t, []).append(a)
+        if len(articles) < 2:
+            return [articles]
 
-        all_groups: list[list[Article]] = []
-        for topic, topic_articles in topic_groups.items():
-            if len(topic_articles) < 2:
-                all_groups.append(topic_articles)
-                continue
+        corpus = [self._article_text(a) for a in articles]
+        vectorizer = TfidfVectorizer(stop_words="english")
+        tfidf_matrix = vectorizer.fit_transform(corpus)
 
-            corpus = [self._article_text(a) for a in topic_articles]
-            vectorizer = TfidfVectorizer(stop_words="english")
-            tfidf_matrix = vectorizer.fit_transform(corpus)
+        groups: list[list[int]] = []
+        for idx in range(len(articles)):
+            vec = tfidf_matrix[idx]
+            placed = False
+            for member_indices in groups:
+                rep_vec = tfidf_matrix[member_indices[0]]
+                sim = float(cosine_similarity(vec, rep_vec)[0, 0])
+                if sim >= self.threshold:
+                    member_indices.append(idx)
+                    placed = True
+                    break
+            if not placed:
+                groups.append([idx])
 
-            groups: list[list[int]] = []
-            for idx in range(len(topic_articles)):
-                vec = tfidf_matrix[idx]
-                placed = False
-                for member_indices in groups:
-                    rep_vec = tfidf_matrix[member_indices[0]]
-                    sim = float(cosine_similarity(vec, rep_vec)[0, 0])
-                    if sim >= self.threshold:
-                        member_indices.append(idx)
-                        placed = True
-                        break
-                if not placed:
-                    groups.append([idx])
-
-            all_groups.extend([[topic_articles[i] for i in g] for g in groups])
-
-        return all_groups
+        return [[articles[i] for i in group] for group in groups]
 
     @staticmethod
     def _article_text(article: Article) -> str:

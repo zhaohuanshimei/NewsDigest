@@ -19,6 +19,18 @@ const jsonLd = homepageDigest.kind === "success" ? {
   "datePublished": homepageDigest.digest.published_at,
   "inLanguage": "en"
 } : null;
+
+// Topic filter data (computed at build time)
+interface TopicCount { name: string; count: number; }
+const topicCounts: TopicCount[] = homepageDigest.kind === "success"
+  ? Object.entries(
+      homepageDigest.digest.entries.reduce<Record<string, number>>((acc, e) => {
+        const c = e.category || "general";
+        acc[c] = (acc[c] || 0) + 1;
+        return acc;
+      }, {})
+    ).map(([name, count]) => ({ name, count }))
+  : [];
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} canonicalPath="/">
@@ -46,6 +58,14 @@ const jsonLd = homepageDigest.kind === "success" ? {
             date={homepageDigest.digest.date}
             publishedAt={homepageDigest.digest.published_at.replace("T", " ").replace("Z", " UTC")}
           />
+          <div class="digest-topic-bar" role="tablist" aria-label="Filter by topic">
+            <button class="topic-tab is-active" data-topic="all" role="tab" aria-selected="true">All ({homepageDigest.digest.entries.length})</button>
+            {topicCounts.map(({ name, count }) => (
+              <button class="topic-tab" data-topic={name} role="tab" aria-selected="false">
+                {name.charAt(0).toUpperCase() + name.slice(1)} ({count})
+              </button>
+            ))}
+          </div>
           <DigestEntryList entries={homepageDigest.digest.entries} />
         </section>
       ) : homepageDigest.kind === "empty" ? (
@@ -60,3 +80,61 @@ const jsonLd = homepageDigest.kind === "success" ? {
     <div set:html={`<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`} />
   )}
 </BaseLayout>
+
+<script>
+  document.addEventListener("click", function (e) {
+    var tab = e.target.closest(".topic-tab");
+    if (!tab) return;
+
+    var topic = tab.getAttribute("data-topic") || "all";
+
+    document.querySelectorAll(".topic-tab").forEach(function (t) {
+      var active = t.getAttribute("data-topic") === topic;
+      t.classList.toggle("is-active", active);
+      t.setAttribute("aria-selected", String(active));
+    });
+
+    document.querySelectorAll(".digest-entry").forEach(function (entry) {
+      entry.style.display = topic === "all" || entry.getAttribute("data-category") === topic ? "" : "none";
+    });
+  });
+</script>
+
+<style>
+  .digest-topic-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0.75rem 1.5rem 0;
+  }
+
+  .topic-tab {
+    font-size: 0.72rem;
+    font-family: inherit;
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--surface-border);
+    background: transparent;
+    color: var(--muted-text);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s ease;
+  }
+
+  .topic-tab:hover {
+    color: var(--headline-text);
+    border-color: var(--headline-text);
+  }
+
+  .topic-tab.is-active {
+    background: var(--headline-text);
+    color: var(--page-background);
+    border-color: var(--headline-text);
+  }
+
+  @media (min-width: 48rem) {
+    .digest-topic-bar {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+</style>
