@@ -107,7 +107,7 @@ class TestDigestGenerator:
         assert entry.summary == "Summary 1"
         assert entry.rank == 1
         assert entry.source_count == 2  # two distinct sources
-        assert entry.category is None
+        assert entry.category == "general"  # cluster has no topic → general
 
     def test_idempotent_overwrite(self, db_session) -> None:
         """Re-generating for the same date replaces the old digest cleanly."""
@@ -160,23 +160,28 @@ class TestDigestGenerator:
         assert digest.entries[0].headline == "Boundary"
 
     def test_score_ordering(self, db_session) -> None:
-        """Clusters are sorted by computed score in descending order."""
+        """Clusters are sorted by computed importance score in descending order."""
         src1 = _create_source(db_session, "Source A")
         src2 = _create_source(db_session, "Source B")
         today = date(2026, 6, 26)
         first_seen = datetime(2026, 6, 26, 8, 0, tzinfo=timezone.utc)
 
-        # High-scored cluster (score=10, size=1, 1 source -> 10*0.6 + 1*0.3 + 1*0.1 = 6.4)
-        art1 = _create_article(db_session, src1.id, "High Score", "High")
-        _setup_cluster(db_session, [art1.id], score=10.0, first_seen_at=first_seen)
+        # High-scored cluster: 10 articles from 2 sources → larger size, better diversity
+        high_articles = []
+        for i in range(10):
+            src = src1 if i < 5 else src2
+            a = _create_article(db_session, src.id, f"High Article {i}", f"High {i}")
+            high_articles.append(a)
+        _setup_cluster(db_session, [a.id for a in high_articles], score=5.0, first_seen_at=first_seen)
 
-        # Low-scored cluster (score=1, size=1, 1 source -> 1*0.6 + 1*0.3 + 1*0.1 = 1.0)
-        art2 = _create_article(db_session, src2.id, "Low Score", "Low")
-        _setup_cluster(db_session, [art2.id], score=1.0, first_seen_at=first_seen)
+        # Low-scored cluster: 1 source + 1 article
+        art3 = _create_article(db_session, src2.id, "Low Score", "Low")
+        _setup_cluster(db_session, [art3.id], score=1.0, first_seen_at=first_seen)
 
         gen = DigestGenerator(db_session)
         digest = gen.generate(today)
 
         assert len(digest.entries) == 2
-        assert digest.entries[0].headline == "High Score"
+        # High cluster has 10 articles from 2 sources → higher importance
+        assert digest.entries[0].headline.startswith("High Article")
         assert digest.entries[1].headline == "Low Score"
