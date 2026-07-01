@@ -10,6 +10,7 @@ from app.core.fetcher_interface import NormalizedArticle, make_dedupe_key
 from app.models.article import Article
 from app.repositories.article_repository import ArticleRepository
 from app.services.dedup_service import DedupService
+from app.services.topic_classifier import classify_by_text
 
 TRACKING_PARAMS: frozenset[str] = frozenset({
     "utm_source",
@@ -61,6 +62,9 @@ class ArticleNormalizer:
         if existing is not None:
             return None
 
+        # Topic classification (rule-based, zero AI cost)
+        topic = classify_by_text(cleaned_title, cleaned_summary)
+
         return self.repository.create(
             source_id=article.source_id,
             url=normalized_url,
@@ -71,6 +75,7 @@ class ArticleNormalizer:
             language=article.language,
             normalized_url=normalized_url,
             dedupe_key=dedupe_key,
+            topic=topic,
         )
 
     def _normalize_url(self, url: str) -> str:

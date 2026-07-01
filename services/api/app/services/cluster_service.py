@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from datetime import datetime
 
 from sqlalchemy.orm import Session
@@ -152,14 +153,27 @@ class ClusterService:
             score *= SINGLE_SOURCE_PENALTY
         return round(score, 4)
 
+    @staticmethod
+    def _pick_topic(group: list[Article]) -> str:
+        """Pick cluster topic by majority vote from member articles.
+
+        Falls back to ``general`` if no articles have a topic set.
+        """
+        topics = [a.topic for a in group if a.topic]
+        if not topics:
+            return "general"
+        return Counter(topics).most_common(1)[0][0]
+
     def _create_cluster_for_group(self, group: list[Article]) -> None:
         representative = self._select_representative(group)
         score = self._compute_score(group)
+        topic = self._pick_topic(group)
 
         cluster = self.repo.create_cluster(
             representative_article_id=representative.id,
             size=len(group),
             score=score,
+            topic=topic,
         )
         # 代表文章 rank=0，其余按 created_at 升序顺延
         rest = sorted(

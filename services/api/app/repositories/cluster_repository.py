@@ -30,11 +30,13 @@ class ClusterRepository:
         representative_article_id: int | None,
         size: int,
         score: float,
+        topic: str | None = None,
     ) -> Cluster:
         cluster = Cluster(
             representative_article_id=representative_article_id,
             size=size,
             score=score,
+            topic=topic,
         )
         self.db.add(cluster)
         self.db.flush()  # 让 cluster.id 可用，但不提交
