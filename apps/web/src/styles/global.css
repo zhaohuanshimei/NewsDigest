@@ -46,6 +46,22 @@ h3 {
   margin-bottom: 4rem;
 }
 
+.page-intro .d-en {
+  display: none;
+}
+
+.page-intro[data-lang="en"] .d-zh {
+  display: none;
+}
+
+.page-intro[data-lang="en"] .d-en {
+  display: block;
+}
+
+.page-intro[data-lang="both"] .d-en {
+  display: block;
+}
+
 .page-eyebrow,
 .digest-kicker,
 .digest-entry-rank {

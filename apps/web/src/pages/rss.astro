@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE_TITLE } from "../lib/config/site";
 
 const pageTitle = "RSS 订阅";
+const feedUrl = "https://news.maczhao.com/feed.xml";
 ---
 
 <BaseLayout title={`${pageTitle} | ${SITE_TITLE}`}>
@@ -17,8 +18,18 @@ const pageTitle = "RSS 订阅";
       <section>
         <h2>订阅地址</h2>
         <p>
-          <code><a href="/feed.xml">/feed.xml</a></code>
+          <code><a href={feedUrl}>{feedUrl}</a></code>
         </p>
+      </section>
+
+      <section>
+        <h2>推荐阅读器</h2>
+        <ul>
+          <li><a href="https://feedly.com" target="_blank" rel="noopener">Feedly</a> — 网页 + 移动端，主流选择</li>
+          <li><a href="https://www.inoreader.com" target="_blank" rel="noopener">Inoreader</a> — 功能强大，支持过滤规则</li>
+          <li><a href="https://netnewswire.com" target="_blank" rel="noopener">NetNewsWire</a> — macOS/iOS 原生，开源免费</li>
+          <li><a href="https://reeder.app" target="_blank" rel="noopener">Reeder</a> — Apple 生态最佳体验</li>
+        </ul>
       </section>
 
       <section>

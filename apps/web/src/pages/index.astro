@@ -23,12 +23,20 @@ const jsonLd = homepageDigest.kind === "success" ? {
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} canonicalPath="/">
   <main class="page-shell">
-    <section class="page-intro" aria-label="Site introduction">
+    <section class="page-intro" aria-label="Site introduction" data-lang="zh">
       <p class="page-eyebrow">News Digest</p>
-      <h1 class="page-title">A quiet front page for the day&apos;s essential stories.</h1>
-      <p class="page-description">
-        Read the latest digest in one pass, with ranked clusters and concise summaries.
-      </p>
+      <div class="d-zh">
+        <h1 class="page-title">为一天的核心新闻，留一份安静的头版。</h1>
+        <p class="page-description">
+          一次读完当日精选摘要，按重要性排序的事件聚类，简明扼要。
+        </p>
+      </div>
+      <div class="d-en">
+        <h1 class="page-title">A quiet front page for the day&apos;s essential stories.</h1>
+        <p class="page-description">
+          Read the latest digest in one pass, with ranked clusters and concise summaries.
+        </p>
+      </div>
     </section>
 
     {

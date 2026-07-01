@@ -68,7 +68,7 @@ const navLinks = [
         b.setAttribute("aria-selected", String(active));
       });
 
-      document.querySelectorAll(".digest-entry, .cluster-header").forEach(function (el) {
+      document.querySelectorAll(".digest-entry, .cluster-header, .page-intro").forEach(function (el) {
         el.setAttribute("data-lang", lang);
         el.querySelectorAll(".lang-btn").forEach(function (b) {
           b.classList.toggle(
