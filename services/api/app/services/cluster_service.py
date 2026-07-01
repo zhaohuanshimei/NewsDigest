@@ -85,31 +85,44 @@ class ClusterService:
     def _group_by_similarity(self, articles: list[Article]) -> list[list[Article]]:
         """TF-IDF + cosine 相似度贪心分组。
 
-        文章按时间顺序处理：若与已有某组代表向量相似度 >= threshold 则并入
-        该组（取第一个满足的组）；否则新建一组。保证一篇文章只归属一个组。
+        优化：先按 topic 预分组，只在同 topic 内算相似度，减少 O(n²) 比较量。
         """
         from sklearn.feature_extraction.text import TfidfVectorizer
         from sklearn.metrics.pairwise import cosine_similarity
 
-        corpus = [self._article_text(a) for a in articles]
-        vectorizer = TfidfVectorizer(stop_words="english")
-        tfidf_matrix = vectorizer.fit_transform(corpus)
+        # Pre-group by topic to reduce comparisons
+        topic_groups: dict[str, list[Article]] = {}
+        for a in articles:
+            t = a.topic or "general"
+            topic_groups.setdefault(t, []).append(a)
 
-        groups: list[list[int]] = []  # 每组存文章在 articles 中的下标
-        for idx in range(len(articles)):
-            vec = tfidf_matrix[idx]
-            placed = False
-            for member_indices in groups:
-                rep_vec = tfidf_matrix[member_indices[0]]
-                sim = float(cosine_similarity(vec, rep_vec)[0, 0])
-                if sim >= self.threshold:
-                    member_indices.append(idx)
-                    placed = True
-                    break
-            if not placed:
-                groups.append([idx])
+        all_groups: list[list[Article]] = []
+        for topic, topic_articles in topic_groups.items():
+            if len(topic_articles) < 2:
+                all_groups.append(topic_articles)
+                continue
 
-        return [[articles[i] for i in group] for group in groups]
+            corpus = [self._article_text(a) for a in topic_articles]
+            vectorizer = TfidfVectorizer(stop_words="english")
+            tfidf_matrix = vectorizer.fit_transform(corpus)
+
+            groups: list[list[int]] = []
+            for idx in range(len(topic_articles)):
+                vec = tfidf_matrix[idx]
+                placed = False
+                for member_indices in groups:
+                    rep_vec = tfidf_matrix[member_indices[0]]
+                    sim = float(cosine_similarity(vec, rep_vec)[0, 0])
+                    if sim >= self.threshold:
+                        member_indices.append(idx)
+                        placed = True
+                        break
+                if not placed:
+                    groups.append([idx])
+
+            all_groups.extend([[topic_articles[i] for i in g] for g in groups])
+
+        return all_groups
 
     @staticmethod
     def _article_text(article: Article) -> str:
