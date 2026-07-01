@@ -8,6 +8,7 @@ from app.core.fetcher_interface import BaseFetcher, FetchRequest, FetchResult
 from app.models.source import Source
 from app.repositories.article_repository import ArticleRepository
 from app.repositories.source_repository import SourceRepository
+from app.services.topic_classifier import classify_by_text
 
 
 class ArticleService:
@@ -43,6 +44,7 @@ class ArticleService:
                 if existing is not None:
                     dup_count += 1
                     continue
+            topic = classify_by_text(article.title, article.summary)
             self.article_repo.create(
                 source_id=source.id,
                 url=article.url,
@@ -53,6 +55,9 @@ class ArticleService:
                 language=article.language,
                 normalized_url=article.normalized_url,
                 dedupe_key=article.dedupe_key,
+                topic=topic,
+                image_url=article.image_url,
+                video_url=article.video_url,
             )
             new_count += 1
 
