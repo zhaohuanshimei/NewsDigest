@@ -25,9 +25,28 @@ const headlineEn = entry.headline;
 const summaryEn = stripHtml(entry.summary);
 
 const entryId = `entry-${entry.rank}`;
+const sources = entry.sources || [];
+const imageUrl = entry.image_url || "";
+const videoUrl = entry.video_url || "";
+const sourceText = sources.length > 0
+  ? `${entry.source_count} sources · ${sources.slice(0, 3).join(", ")}${sources.length > 3 ? " +" + (sources.length - 3) : ""}`
+  : `${entry.source_count} sources`;
 ---
 
 <article class="digest-entry" id={entryId} data-lang="zh">
+  {imageUrl && (
+    <div class="digest-entry-media">
+      <img src={imageUrl} alt={headlineEn} loading="lazy" class="digest-entry-image" />
+    </div>
+  )}
+  {videoUrl && !imageUrl && (
+    <div class="digest-entry-media">
+      <a href={videoUrl} target="_blank" rel="noopener" class="digest-entry-video-link">
+        <span class="digest-entry-video-badge">▶ Video</span>
+      </a>
+    </div>
+  )}
+
   <div class="digest-entry-bar">
     <p class="digest-entry-rank">{entry.rank.toString().padStart(2, "0")}</p>
     <div class="digest-entry-lang-tools">
@@ -50,7 +69,7 @@ const entryId = `entry-${entry.rank}`;
     <p class="digest-entry-summary">{summaryEn}</p>
   </div>
 
-  <p class="digest-entry-meta">{entry.source_count} sources</p>
+  <p class="digest-entry-meta">{sourceText}</p>
 </article>
 
 <script>
@@ -85,6 +104,38 @@ const entryId = `entry-${entry.rank}`;
 
   .digest-entry:last-child {
     border-bottom: 0;
+  }
+
+  .digest-entry-media {
+    width: 100%;
+    margin-bottom: 0.25rem;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .digest-entry-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 18rem;
+    object-fit: cover;
+  }
+
+  .digest-entry-video-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 10rem;
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--surface-border);
+    border-radius: 2px;
+    text-decoration: none;
+  }
+
+  .digest-entry-video-badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--headline-text);
   }
 
   .digest-entry-bar {

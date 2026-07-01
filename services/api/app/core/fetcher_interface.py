@@ -48,6 +48,8 @@ class ExtractedItem:
     body: str | None = None
     published_at: datetime | None = None
     language: str | None = None
+    image_url: str | None = None
+    video_url: str | None = None
     raw: dict | None = None
 
 
@@ -62,6 +64,8 @@ class NormalizedArticle:
     source_id: int | None = None
     dedupe_key: str | None = None
     normalized_url: str | None = None
+    image_url: str | None = None
+    video_url: str | None = None
 
 
 def make_dedupe_key(title: str, url: str) -> str:

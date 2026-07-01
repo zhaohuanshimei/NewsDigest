@@ -33,6 +33,8 @@ class Article(Base):
         String(255), nullable=True, unique=True, index=True
     )
     topic: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    video_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow, onupdate=_utcnow

@@ -76,6 +76,8 @@ class ArticleNormalizer:
             normalized_url=normalized_url,
             dedupe_key=dedupe_key,
             topic=topic,
+            image_url=article.image_url,
+            video_url=article.video_url,
         )
 
     def _normalize_url(self, url: str) -> str:

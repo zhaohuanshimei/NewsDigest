@@ -86,6 +86,9 @@ class RssFetcher(BaseFetcher):
             if hasattr(entry, "content") and entry.content:
                 body = entry.content[0].get("value", "")
 
+            image_url = _extract_image_url(entry)
+            video_url = _extract_video_url(entry)
+
             items.append(ExtractedItem(
                 title=entry.get("title"),
                 url=entry.get("link"),
@@ -93,6 +96,8 @@ class RssFetcher(BaseFetcher):
                 body=body,
                 published_at=published,
                 language=feed.feed.get("language") if hasattr(feed, "feed") else None,
+                image_url=image_url,
+                video_url=video_url,
                 raw=entry,
             ))
         return items
@@ -111,5 +116,67 @@ class RssFetcher(BaseFetcher):
                 body=item.body,
                 published_at=item.published_at,
                 dedupe_key=dedupe_key,
+                image_url=item.image_url,
+                video_url=item.video_url,
             ))
         return result
+
+
+def _extract_image_url(entry) -> str | None:
+    """Extract the best available image URL from an RSS entry.
+
+    Priority: media_thumbnail > media_content (medium=image) > enclosure (image/*)
+    """
+    # media_thumbnail (BBC style)
+    if hasattr(entry, "media_thumbnail") and entry.media_thumbnail:
+        for thumb in entry.media_thumbnail:
+            url = thumb.get("url") if isinstance(thumb, dict) else getattr(thumb, "url", None)
+            if url:
+                return url
+
+    # media_content with medium=image (Guardian/CNN style)
+    if hasattr(entry, "media_content") and entry.media_content:
+        for media in entry.media_content:
+            if isinstance(media, dict):
+                medium = media.get("medium", "")
+                url = media.get("url", "")
+                if url and (medium == "image" or not medium):
+                    return url
+
+    # enclosure with image type
+    if hasattr(entry, "enclosures") and entry.enclosures:
+        for enc in entry.enclosures:
+            enc_type = getattr(enc, "type", "") or (enc.get("type", "") if isinstance(enc, dict) else "")
+            enc_url = getattr(enc, "href", "") or (enc.get("href", "") if isinstance(enc, dict) else "")
+            if enc_url and ("image" in enc_type):
+                return enc_url
+
+    return None
+
+
+def _extract_video_url(entry) -> str | None:
+    """Detect video content from an RSS entry.
+
+    Checks: media_content with medium=video > enclosure with video type > URL pattern.
+    """
+    # media_content with medium=video
+    if hasattr(entry, "media_content") and entry.media_content:
+        for media in entry.media_content:
+            if isinstance(media, dict):
+                if media.get("medium") == "video" and media.get("url"):
+                    return media["url"]
+
+    # enclosure with video type
+    if hasattr(entry, "enclosures") and entry.enclosures:
+        for enc in entry.enclosures:
+            enc_type = getattr(enc, "type", "") or (enc.get("type", "") if isinstance(enc, dict) else "")
+            enc_url = getattr(enc, "href", "") or (enc.get("href", "") if isinstance(enc, dict) else "")
+            if enc_url and ("video" in enc_type):
+                return enc_url
+
+    # URL pattern detection (e.g. CNN /videos/ paths)
+    link = entry.get("link", "") or ""
+    if "/video" in link.lower() or "/watch/" in link.lower():
+        return link
+
+    return None
